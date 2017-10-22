@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+
+    <TextView
+        android:id="@+id/selectedCategoryTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/selected_category"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/whichQuestionTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/current_question"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/rightAnswerTV"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/right_answer" />
+
+    <TextView
+        android:id="@+id/yourAnswerTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:text="@string/your_answer" />
+
+    <Button
+        android:id="@+id/listenBTN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/listen" />
+
+    <Button
+        android:id="@+id/ans1BTN"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/ans1" />
+
+    <Button
+        android:id="@+id/ans2BTN"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ans2" />
+
+    <Button
+        android:id="@+id/ans3BTN"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ans3" />
+
+    <Button
+        android:id="@+id/ans4BTN"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ans4" />
+
+    <Button
+        android:id="@+id/nextQuestionBTN"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:onClick="nextQuestionBTN"
+        android:text="@string/next_question" />
+
+</LinearLayout>

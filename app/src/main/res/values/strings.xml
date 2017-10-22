@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">LanguageLearner</string>
+    <string name="select_or_make_account">Wybierz lub stwórz konto.</string>
+    <string name="add_account">Stwórz konto</string>
+    <string name="default_name">[Default name]</string>
+    <string name="enter_name_to_register">Enter Name To Register</string>
+    <string name="enter_your_name_here">Enter Your Name Here</string>
+    <string name="add_account_button">Add Account</string>
+    <string name="new_words">Nowy Materiał</string>
+    <string name="current_question">Current Question</string>
+    <string name="german_word">german_word</string>
+    <string name="check_answer">Check Answer</string>
+    <string name="next_question">Next Question</string>
+    <string name="enter_answer_here">Enter answer here</string>
+    <string name="start_learning">Start Learning</string>
+    <string name="choose_category">Choose Category</string>
+    <string name="choosen_category">Choosen Category</string>
+    <string name="selected_category">Selected Category</string>
+    <string name="word_we_are_asking_for">To Answer For</string>
+    <string name="right_answer">Right Answer</string>
+    <string name="your_answer">Your Answer</string>
+    <string name="continueToNextCategory">Continue</string>
+    <string name="ans1">ans1</string>
+    <string name="ans2">ans2</string>
+    <string name="ans3">ans3</string>
+    <string name="ans4">ans4</string>
+    <string name="listen">Listen</string>
+</resources>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp"
+    tools:context="com.example.blazej.languagelearner.LoginActivity">
+
+
+    <TextView
+        android:id="@+id/selectTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:text="@string/select_or_make_account"
+        android:fontFamily="sans-serif-light"
+        android:textSize="20sp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/all_accounts_list_view"
+        android:layout_width="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_height="350dp" />
+
+    <Button
+        android:id="@+id/add_account_button"
+        android:layout_width="match_parent"
+        android:text="@string/add_account"
+        android:fontFamily="sans-serif-light"
+        android:layout_marginTop="20dp"
+        android:layout_height="50dp"
+        android:onClick="startRegisterActivity"/>
+</LinearLayout>
