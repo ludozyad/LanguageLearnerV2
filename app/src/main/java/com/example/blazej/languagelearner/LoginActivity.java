@@ -4,16 +4,20 @@ package com.example.blazej.languagelearner;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.blazej.languagelearner.data.AccountListContract;
 import com.example.blazej.languagelearner.data.AccountListDbHelper;
+import com.example.blazej.languagelearner.data.WordAccountStatusDbHelper;
+import com.example.blazej.languagelearner.data.WordListContract;
 
 public class LoginActivity extends AppCompatActivity{
 
@@ -52,6 +56,7 @@ public class LoginActivity extends AppCompatActivity{
             }
         });
     }
+
 
     public void startRegisterActivity(View view) {
         Intent intent = new Intent(this,RegisterActivity.class);

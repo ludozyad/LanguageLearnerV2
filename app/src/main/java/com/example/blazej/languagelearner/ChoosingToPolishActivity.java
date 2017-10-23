@@ -17,7 +17,7 @@ import java.util.Random;
 public class ChoosingToPolishActivity extends AppCompatActivity implements View.OnClickListener {
 
 
-
+    String accountName;
     TextView selectedCategoryTV;
     TextView whichQuestionTV;
     TextView toLearnWordTV;
@@ -26,9 +26,11 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
     int questionCount;
     int currentQuestion;
     String germanWord;
-    String polishWord;
+    String rightAnswer;
     ArrayList<String> germanWordsInCategory = new ArrayList<>();
     ArrayList<String> polishWordsInCategory = new ArrayList<>();
+    ArrayList<String> learnedWords = new ArrayList<>();
+    ArrayList<String> missedWords = new ArrayList<>();
     String categoryName;
     Button nextQuestionBTN;
     Button ans1BTN;
@@ -65,13 +67,19 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
         myButtonList.add(ans4BTN);
         currentQuestion = 1;
 
+        //getting data from intent
         Intent intent = getIntent();
         germanWordsInCategory = intent.getStringArrayListExtra("german_words");
         polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+        learnedWords = intent.getStringArrayListExtra("learned_words");
+        missedWords = intent.getStringArrayListExtra("missed_words");
+        accountName = intent.getStringExtra("account_name");
+        categoryName = intent.getStringExtra("category_name");
+        //////////////////////////////
+
         long seed = System.nanoTime();
         Collections.shuffle(germanWordsInCategory, new Random(seed));
         Collections.shuffle(polishWordsInCategory, new Random(seed));
-        categoryName = intent.getStringExtra("category_name");
         selectedCategoryTV.setText(categoryName);
         questionCount = germanWordsInCategory.size();
 
@@ -85,11 +93,11 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
             // To co mamy przetlumaczyć
             germanWord = germanWordsInCategory.get(index);
             // Dobra odpowiedz
-            polishWord = polishWordsInCategory.get(index);
+            rightAnswer = polishWordsInCategory.get(index);
             toLearnWordTV.setText(germanWord);
             int buttonIndexWithGoodAns = randInt(0,3);
             goodAnsIndex = buttonIndexWithGoodAns;
-            myButtonList.get(buttonIndexWithGoodAns).setText(polishWord);
+            myButtonList.get(buttonIndexWithGoodAns).setText(rightAnswer);
             switch(buttonIndexWithGoodAns){
                 case 0:
                     Log.v("TAG", "Case 0");
@@ -144,6 +152,11 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
         Intent myIntent = new Intent(this,LearningSummaryActivity.class);
         myIntent.putStringArrayListExtra("german_words",germanWordsInCategory);
         myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
+        myIntent.putStringArrayListExtra("learned_words",learnedWords);
+        myIntent.putStringArrayListExtra("missed_words",missedWords);
+        myIntent.putExtra("category_name",categoryName);
+        myIntent.putExtra("account_name",accountName);
+        Log.v("TAG", "Account Name: " + accountName+ " --- Selected Category: " + categoryName);
         startActivityForResult(myIntent,1);
     }
 
@@ -151,15 +164,16 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.ans1BTN:
-                Log.v("TAG", "Przycisk 1");
                 if(goodAnsIndex == 0){
+                    learnedWords.add(rightAnswer);
                     yourAnswerTV.setText("Your answer: " + ans1BTN.getText());
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
+                    missedWords.add(rightAnswer);
                     yourAnswerTV.setText("Your answer: " + ans1BTN.getText());
                     yourAnswerTV.setTextColor(Color.RED);
                 }
-                rightAnswerTV.setText("Right answer: " + polishWord);
+                rightAnswerTV.setText("Right answer: " + rightAnswer);
                 rightAnswerTV.setVisibility(View.VISIBLE);
                 yourAnswerTV.setVisibility(View.VISIBLE);
                 ans1BTN.setVisibility(View.INVISIBLE);
@@ -169,15 +183,16 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
                 nextQuestionBTN.setVisibility(View.VISIBLE);
                 break;
             case R.id.ans2BTN:
-                Log.v("TAG", "Przycisk 2");
                 if(goodAnsIndex == 1){
+                    learnedWords.add(rightAnswer);
                     yourAnswerTV.setText("Your answer: " + ans2BTN.getText());
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
+                    missedWords.add(rightAnswer);
                     yourAnswerTV.setText("Your answer: " + ans2BTN.getText());
                     yourAnswerTV.setTextColor(Color.RED);
                 }
-                rightAnswerTV.setText("Right answer: " + polishWord);
+                rightAnswerTV.setText("Right answer: " + rightAnswer);
                 rightAnswerTV.setVisibility(View.VISIBLE);
                 yourAnswerTV.setVisibility(View.VISIBLE);
                 ans1BTN.setVisibility(View.INVISIBLE);
@@ -188,14 +203,15 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
                 break;
             case R.id.ans3BTN:
                 if(goodAnsIndex == 2){
-                    Log.v("TAG", "Przycisk 3");
+                    learnedWords.add(rightAnswer);
                     yourAnswerTV.setText("Your answer: " + ans3BTN.getText());
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
+                    missedWords.add(rightAnswer);
                     yourAnswerTV.setText("Your answer: " + ans3BTN.getText());
                     yourAnswerTV.setTextColor(Color.RED);
                 }
-                rightAnswerTV.setText("Right answer: " + polishWord);
+                rightAnswerTV.setText("Right answer: " + rightAnswer);
                 rightAnswerTV.setVisibility(View.VISIBLE);
                 yourAnswerTV.setVisibility(View.VISIBLE);
                 ans1BTN.setVisibility(View.INVISIBLE);
@@ -205,15 +221,16 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
                 nextQuestionBTN.setVisibility(View.VISIBLE);
                 break;
             case R.id.ans4BTN:
-                Log.v("TAG", "Przycisk 4");
                 if(goodAnsIndex == 3){
+                    learnedWords.add(rightAnswer);
                     yourAnswerTV.setText("Your answer: " + ans4BTN.getText());
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
+                    missedWords.add(rightAnswer);
                     yourAnswerTV.setText("Your answer: " + ans4BTN.getText());
                     yourAnswerTV.setTextColor(Color.RED);
                 }
-                rightAnswerTV.setText("Right answer: " + polishWord);
+                rightAnswerTV.setText("Right answer: " + rightAnswer);
                 rightAnswerTV.setVisibility(View.VISIBLE);
                 yourAnswerTV.setVisibility(View.VISIBLE);
                 ans1BTN.setVisibility(View.INVISIBLE);

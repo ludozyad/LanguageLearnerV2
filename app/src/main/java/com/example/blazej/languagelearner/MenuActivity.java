@@ -15,6 +15,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.blazej.languagelearner.data.AccountListContract;
+import com.example.blazej.languagelearner.data.WordAccountStatusContract;
+import com.example.blazej.languagelearner.data.WordAccountStatusDbHelper;
 import com.example.blazej.languagelearner.data.WordListContract;
 import com.example.blazej.languagelearner.data.WordsDbHelper;
 
@@ -28,7 +30,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String TAG = "MenuActivity";
     private static final int LOADER_ID = 1;
 
-    private SQLiteDatabase myDB;
+    private SQLiteDatabase myWordsDB;
     private ProgressBar spinner;
 
     @Override
@@ -37,8 +39,10 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_menu);
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
         spinner.setVisibility(View.GONE);
-        WordsDbHelper dbHelper = new WordsDbHelper(this);
-        myDB = dbHelper.getWritableDatabase();
+        WordsDbHelper wordsDbHelper = new WordsDbHelper(this);
+        myWordsDB = wordsDbHelper.getWritableDatabase();
+        WordAccountStatusDbHelper isLearnerDbHelper = new WordAccountStatusDbHelper(this);
+        WordAccountStatusContract.myIsLearnedDB = isLearnerDbHelper.getWritableDatabase();
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
@@ -66,7 +70,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
                 Log.v(TAG,"loadInBackground()");
                 WordListContract.headingList = DownloadTask.downloadHeadingName(WordListContract.wordListUrl, WordListContract.categoriesHtmlPlace);
                 ArrayList<LinkedHashMap<String, String>> wordList = DownloadTask.downloadAllWords(WordListContract.wordListUrl, WordListContract.categoriesHtmlPlace, WordListContract.baseSiteUll, WordListContract.wordsTables);
-                WordsDbHelper.fillMyBase(WordListContract.headingList, wordList, myDB);
+                WordsDbHelper.fillMyBase(WordListContract.headingList, wordList, myWordsDB);
                 return getTableCursor();
             }
 
@@ -100,7 +104,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public Cursor getTableCursor() {
         Log.v(TAG,"getTableCursor()");
-        return this.myDB.query(
+        return this.myWordsDB.query(
                 WordListContract.DatabaseColumnsEntry.TABLE_NAME,
                 null,
                 null,

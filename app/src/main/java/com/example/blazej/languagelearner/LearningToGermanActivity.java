@@ -1,14 +1,19 @@
 package com.example.blazej.languagelearner;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.blazej.languagelearner.data.WordAccountStatusContract;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,11 +29,17 @@ public class LearningToGermanActivity extends AppCompatActivity {
     EditText enterWordET;
     Button checkAnswerBTN;
     Button nextQuestionBTN;
+    String polishWord;
+    String rightAnswer;
     int questionCount;
     int currentQuestion;
     ArrayList<String> germanWordsInCategory = new ArrayList<>();
     ArrayList<String> polishWordsInCategory = new ArrayList<>();
+    ArrayList<String> learnedWords = new ArrayList<>();
+    ArrayList<String> missedWords = new ArrayList<>();
     String categoryName;
+    String accountName;
+    Cursor wordAccountStatusCursor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,15 +57,24 @@ public class LearningToGermanActivity extends AppCompatActivity {
         nextQuestionBTN.setVisibility(View.INVISIBLE);
         currentQuestion = 1;
 
+        //getting data from intent
         Intent intent = getIntent();
         germanWordsInCategory = intent.getStringArrayListExtra("german_words");
         polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+        learnedWords = intent.getStringArrayListExtra("learned_words");
+        missedWords = intent.getStringArrayListExtra("missed_words");
+        accountName = intent.getStringExtra("account_name");
+        categoryName = intent.getStringExtra("category_name");
+        //////////////////////////////
+
         long seed = System.nanoTime();
         Collections.shuffle(germanWordsInCategory, new Random(seed));
         Collections.shuffle(polishWordsInCategory, new Random(seed));
         categoryName = intent.getStringExtra("category_name");
         selectedCategoryTV.setText(categoryName);
         questionCount = germanWordsInCategory.size();
+        wordAccountStatusCursor = WordAccountStatusContract.getWordAccountStatusCursor();
+        //TODO sprawdzic czy dziala XD
         questionCore(questionCount, currentQuestion);
     }
 
@@ -62,7 +82,7 @@ public class LearningToGermanActivity extends AppCompatActivity {
         if(currentQuestion <= questionCount){
             whichQuestionTV.setText(currentQuestion + " of " + questionCount);
             int index = currentQuestion - 1;
-            String polishWord = polishWordsInCategory.get(index);
+            polishWord = polishWordsInCategory.get(index);
             toLearnWordTV.setText(polishWord);
         }else{
             Toast.makeText(this, "Koniec Pytań!", Toast.LENGTH_SHORT).show();
@@ -85,16 +105,18 @@ public class LearningToGermanActivity extends AppCompatActivity {
         if(enterWordET.getText().length() > 0) {
             String yourAnswer = enterWordET.getText().toString();
             int index = currentQuestion - 1;
-            String rightAnswer = germanWordsInCategory.get(index);
+            rightAnswer = germanWordsInCategory.get(index);
             if (yourAnswer.equals(rightAnswer)){
                 Toast.makeText(this, "Poprawna Odpowiedź!", Toast.LENGTH_SHORT).show();
                 yourAnswerTV.setText("Your Answer: " + yourAnswer);
                 rightAnswerTV.setText("Right Answer: " + rightAnswer);
+                learnedWords.add(polishWord);
                 yourAnswerTV.setTextColor(Color.GREEN);
             }else{
                 Toast.makeText(this, "Błędna Odpowiedź!", Toast.LENGTH_SHORT).show();
                 yourAnswerTV.setText("Your Answer: " + yourAnswer);
                 rightAnswerTV.setText("Right Answer: " + rightAnswer);
+                missedWords.add(polishWord);
                 yourAnswerTV.setTextColor(Color.RED);
             }
             rightAnswerTV.setVisibility(View.VISIBLE);
@@ -113,6 +135,11 @@ public class LearningToGermanActivity extends AppCompatActivity {
         Intent myIntent = new Intent(this,LearningSummaryActivity.class);
         myIntent.putStringArrayListExtra("german_words",germanWordsInCategory);
         myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
+        myIntent.putStringArrayListExtra("learned_words",learnedWords);
+        myIntent.putStringArrayListExtra("missed_words",missedWords);
+        myIntent.putExtra("category_name",categoryName);
+        myIntent.putExtra("account_name",accountName);
+        Log.v("TAG", "Account Name: " + accountName+ " --- Selected Category: " + categoryName);
         startActivityForResult(myIntent,1);
     }
 }
