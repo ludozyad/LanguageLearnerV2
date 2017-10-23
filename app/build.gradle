@@ -4,6 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "26.0.1"
     defaultConfig {
+
         applicationId "com.example.blazej.languagelearner"
         minSdkVersion 21
         targetSdkVersion 25
