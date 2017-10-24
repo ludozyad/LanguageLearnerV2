@@ -30,6 +30,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String TAG = "MenuActivity";
     private static final int LOADER_ID = 1;
 
+
     private SQLiteDatabase myWordsDB;
     private ProgressBar spinner;
 
@@ -85,16 +86,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(TAG,"onLoadFinished");
-        Cursor myCursor = getTableCursor();
-        while(myCursor.moveToNext()){
-            int id = myCursor.getInt(0);
-            String germanWord = myCursor.getString(1);
-            String polishWord = myCursor.getString(2);
-            String category = myCursor.getString(3);
-            int catCount = myCursor.getInt(4);
-            Log.v(TAG,id + " " + germanWord + " " + polishWord + " " + category + " " + catCount);
             spinner.setVisibility(View.GONE);
-        }
     }
 
     @Override
@@ -117,6 +109,11 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public void onChooseCategoryClick(View view) {
         Intent intent = new Intent(this,ChooseCategoryActivity.class);
+        startActivity(intent);
+    }
+
+    public void onReviewContent(View view) {
+        Intent intent = new Intent(this, ReviewActivity.class);
         startActivity(intent);
     }
 }

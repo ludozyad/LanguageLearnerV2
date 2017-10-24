@@ -25,4 +25,6 @@
     <string name="ans3">ans3</string>
     <string name="ans4">ans4</string>
     <string name="listen">Listen</string>
+    <string name="powtorki">Powtórki</string>
+    <string name="rozpocznij_powtorki">Rozpocznij powtórki</string>
 </resources>

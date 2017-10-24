@@ -26,7 +26,8 @@
         <activity android:name=".LearningSummaryActivity" />
         <activity android:name=".ChoosingToPolishActivity" />
         <activity android:name=".ChoosingToGermanActivity" />
-        <activity android:name=".ListenActivity"></activity>
+        <activity android:name=".ListenActivity" />
+        <activity android:name=".ReviewActivity"></activity>
     </application>
 
 </manifest>

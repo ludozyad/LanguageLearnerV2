@@ -25,11 +25,13 @@ import com.example.blazej.languagelearner.data.WordsDbHelper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class LearningToPolishActivity extends AppCompatActivity {
     SharedPreferences sharedPref;
     String accountName;
+    String callingActivity;
     public String selectedCategory = "category";
     TextView selectedCategoryTV;
     TextView whichQuestionTV;
@@ -68,35 +70,57 @@ public class LearningToPolishActivity extends AppCompatActivity {
         checkAnswerBTN = (Button)findViewById(R.id.checkAnswerBTN);
         nextQuestionBTN = (Button)findViewById(R.id.nextQuestionBTN);
         nextQuestionBTN.setVisibility(View.INVISIBLE);
-        WordsDbHelper myDBHelper = new WordsDbHelper(this);
-        myDB = myDBHelper.getWritableDatabase();
 
-        wordAccountStatusCursor = WordAccountStatusContract.getWordAccountStatusCursor();
 
-        if (savedInstanceState == null) {
-            Bundle extras = getIntent().getExtras();
-            if(extras == null) {
-                categoryName = null;
-            } else {
-                categoryName = extras.getString(selectedCategory);
-            }
-        } else {
-            categoryName = (String) savedInstanceState.getSerializable(selectedCategory);
+
+
+        /////////////
+        Intent intent = getIntent();
+        callingActivity = getCallingActivity().getClassName();
+        switch (callingActivity){
+            case "com.example.blazej.languagelearner.ChooseCategoryActivity":
+                WordsDbHelper myDBHelper = new WordsDbHelper(this);
+                myDB = myDBHelper.getWritableDatabase();
+                wordAccountStatusCursor = WordAccountStatusContract.getWordAccountStatusCursor();
+                if (savedInstanceState == null) {
+                    Bundle extras = getIntent().getExtras();
+                    if(extras == null) {
+                        categoryName = null;
+                    } else {
+                        categoryName = extras.getString(selectedCategory);
+                    }
+                } else {
+                    categoryName = (String) savedInstanceState.getSerializable(selectedCategory);
+                }
+                selectedCategoryTV.setText("Selected Category: " + categoryName);
+                int categoryCount = intent.getIntExtra("category_count",1);
+
+                Cursor wordsInCategory = getWordsInCategory(categoryName);
+                while(wordsInCategory.moveToNext()){
+                    germanWordsInCategory.add(wordsInCategory.getString(0));
+                    polishWordsInCategory.add(wordsInCategory.getString(1));
+                }
+                long seed = System.nanoTime();
+                Collections.shuffle(germanWordsInCategory, new Random(seed));
+                Collections.shuffle(polishWordsInCategory, new Random(seed));
+                germanWordsInCategory = new ArrayList<>(germanWordsInCategory.subList(0,categoryCount));
+                polishWordsInCategory = new ArrayList<>(polishWordsInCategory.subList(0,categoryCount));
+                ///////////////////////////
+                questionCount = categoryCount;
+                break;
+            case "com.example.blazej.languagelearner.ReviewActivity":
+                questionCount = intent.getIntExtra("words_to_review_count",0);
+                germanWordsInCategory = intent.getStringArrayListExtra("german_words");
+                polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+                long seed2 = System.nanoTime();
+                Collections.shuffle(germanWordsInCategory, new Random(seed2));
+                Collections.shuffle(polishWordsInCategory, new Random(seed2));
+                germanWordsInCategory = new ArrayList<>(germanWordsInCategory.subList(0,questionCount));
+                polishWordsInCategory = new ArrayList<>(polishWordsInCategory.subList(0,questionCount));
+                categoryName = "";
+                break;
         }
-        selectedCategoryTV.setText("Selected Category: " + categoryName);
-
-        Cursor wordsInCategory = getWordsInCategory(categoryName);
-
-        while(wordsInCategory.moveToNext()){
-            germanWordsInCategory.add(wordsInCategory.getString(0));
-            polishWordsInCategory.add(wordsInCategory.getString(1));
-        }
-        long seed = System.nanoTime();
-        Collections.shuffle(germanWordsInCategory, new Random(seed));
-        Collections.shuffle(polishWordsInCategory, new Random(seed));
-
         currentQuestion = 1;
-        questionCount = wordsInCategory.getCount();
         questionCore(questionCount, currentQuestion);
 
     }
@@ -175,7 +199,6 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 null,
                 null,
                 null);
-
     }
 
 }

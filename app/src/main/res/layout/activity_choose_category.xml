@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="20dp"
+    android:weightSum="1">
 
 
     <TextView
@@ -19,8 +20,36 @@
     <ListView
         android:id="@+id/categoriesListView"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:layout_marginTop="50dp"/>
+        android:layout_height="250dp"
+        android:layout_marginTop="80dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <NumberPicker
+            android:id="@+id/numberPicker"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_alignParentStart="true" />
+
+        <Button
+            android:id="@+id/startLearningActivityBTN"
+            android:onClick="startLearningActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="50dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:text="Start Learning" />
+    </RelativeLayout>
 
 </LinearLayout>
 

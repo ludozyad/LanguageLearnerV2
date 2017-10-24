@@ -29,6 +29,18 @@ public class WordAccountStatusContract {
                 null,
                 null);
     }
+
+    public static Cursor getWordAccountStatusCursorWithSpecificAccount(String accountName){
+        return myIsLearnedDB.query
+                (DatabaseColumnsEntry.TABLE_NAME,
+                        null,
+                        DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = ?",
+                        new String[]{accountName},
+                        null,
+                        null,
+                        null);
+    }
+
     public static boolean ifWordAccountStatusCursorContain(String word,String categoryName,String accountName){
         Cursor cursor = getWordAccountStatusCursor();
             while(cursor.moveToNext()){
