@@ -27,6 +27,7 @@ public class LearningSummaryActivity extends AppCompatActivity {
     ArrayList<String> learnedWords = new ArrayList<>();
     ArrayList<String> missedWords = new ArrayList<>();
     ArrayList<String> reallyLearnedWords = new ArrayList<>();
+    ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
     //Cursor cursor;
     String categoryName;
     String accountName;
@@ -47,6 +48,7 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 accountName = intent.getStringExtra("account_name");
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+                categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 learnedWords = intent.getStringArrayListExtra("learned_words");
                 missedWords = intent.getStringArrayListExtra("missed_words");
                 categoryName = intent.getStringExtra("category_name");
@@ -56,6 +58,7 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 accountName = intent.getStringExtra("account_name");
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+                categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 learnedWords = intent.getStringArrayListExtra("learned_words");
                 missedWords = intent.getStringArrayListExtra("missed_words");
                 categoryName = intent.getStringExtra("category_name");
@@ -65,6 +68,7 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 accountName = intent.getStringExtra("account_name");
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+                categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 learnedWords = intent.getStringArrayListExtra("learned_words");
                 missedWords = intent.getStringArrayListExtra("missed_words");
                 categoryName = intent.getStringExtra("category_name");
@@ -74,15 +78,28 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 accountName = intent.getStringExtra("account_name");
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+                categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 learnedWords = intent.getStringArrayListExtra("learned_words");
                 missedWords = intent.getStringArrayListExtra("missed_words");
                 categoryName = intent.getStringExtra("category_name");
 
                 break;
             case "com.example.blazej.languagelearner.ListenActivity":
+                ///////////////////////
+                Cursor myCursor1 = WordAccountStatusContract.getWordAccountStatusCursor();
+                if(myCursor1.getCount() > 0){
+                    while(myCursor1.moveToNext()){
+                        Log.v("TAG", myCursor1.getString(1) + " -- " + myCursor1.getString(2) + " -- "  + myCursor1.getString(3) + " -- "  + myCursor1.getInt(4));
+                    }
+                }else{
+                    Log.v("TAG", "Kursor pusty?!?!?!");
+                }
+                myCursor1.close();
+                /////////////////////
                 accountName = intent.getStringExtra("account_name");
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+                categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 learnedWords = intent.getStringArrayListExtra("learned_words");
                 missedWords = intent.getStringArrayListExtra("missed_words");
                 categoryName = intent.getStringExtra("category_name");
@@ -100,6 +117,7 @@ public class LearningSummaryActivity extends AppCompatActivity {
                     missedWordsTemp.addAll(hs);
                     addUnLearnedWordsToBase(missedWordsTemp);
                 }
+                //////////////////////////////
                 Cursor cursor = WordAccountStatusContract.getWordAccountStatusCursor();
                 if(cursor.getCount() > 0){
                     while(cursor.moveToNext()){
@@ -108,15 +126,22 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 }else{
                     Log.v("TAG", "Kursor pusty?!?!?!");
                 }
+                //////////////////////////////////////
                 break;
         }
 
     }
 
+
     private void addUnLearnedWordsToBase(ArrayList<String> reallyUnLearnedWords){
         Log.v("TAG", "unlearnedwords size: " + reallyUnLearnedWords.size());
         for(int i=0; i < reallyUnLearnedWords.size(); i++) {
+            if (categoriesOfWordsToReview.size() > 0){
+                categoryName = categoriesOfWordsToReview.get(i);
+            }
+            Log.v("TAG", "Category name: " + categoryName);
             if (!WordAccountStatusContract.ifWordAccountStatusCursorContain(reallyUnLearnedWords.get(i),categoryName,accountName)) {
+                Log.v("TAG", "znalezione słowo nie posiada duplikatu, dodajemy: " + reallyUnLearnedWords.get(i));
                 ContentValues cv = new ContentValues();
                 cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, reallyUnLearnedWords.get(i));
                 cv.put(WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
@@ -167,6 +192,7 @@ public class LearningSummaryActivity extends AppCompatActivity {
             myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
             myIntent.putStringArrayListExtra("learned_words",learnedWords);
             myIntent.putStringArrayListExtra("missed_words",missedWords);
+            myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
             myIntent.putExtra("category_name",categoryName);
             myIntent.putExtra("account_name",accountName);
             startActivity(myIntent);
@@ -176,6 +202,7 @@ public class LearningSummaryActivity extends AppCompatActivity {
             myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
             myIntent.putStringArrayListExtra("learned_words",learnedWords);
             myIntent.putStringArrayListExtra("missed_words",missedWords);
+            myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
             myIntent.putExtra("category_name",categoryName);
             myIntent.putExtra("account_name",accountName);
             startActivity(myIntent);
@@ -185,6 +212,7 @@ public class LearningSummaryActivity extends AppCompatActivity {
             myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
             myIntent.putStringArrayListExtra("learned_words",learnedWords);
             myIntent.putStringArrayListExtra("missed_words",missedWords);
+            myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
             myIntent.putExtra("category_name",categoryName);
             myIntent.putExtra("account_name",accountName);
             startActivity(myIntent);
@@ -194,6 +222,7 @@ public class LearningSummaryActivity extends AppCompatActivity {
             myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
             myIntent.putStringArrayListExtra("learned_words",learnedWords);
             myIntent.putStringArrayListExtra("missed_words",missedWords);
+            myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
             myIntent.putExtra("category_name",categoryName);
             myIntent.putExtra("account_name",accountName);
             startActivity(myIntent);

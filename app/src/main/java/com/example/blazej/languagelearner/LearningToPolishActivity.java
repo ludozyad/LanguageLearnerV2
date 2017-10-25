@@ -50,6 +50,7 @@ public class LearningToPolishActivity extends AppCompatActivity {
     ArrayList<String> polishWordsInCategory = new ArrayList<>();
     ArrayList<String> learnedWords = new ArrayList<>();
     ArrayList<String> missedWords = new ArrayList<>();
+    ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
     String categoryName;
     Cursor wordAccountStatusCursor;
     @Override
@@ -82,39 +83,36 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 WordsDbHelper myDBHelper = new WordsDbHelper(this);
                 myDB = myDBHelper.getWritableDatabase();
                 wordAccountStatusCursor = WordAccountStatusContract.getWordAccountStatusCursor();
-                if (savedInstanceState == null) {
-                    Bundle extras = getIntent().getExtras();
-                    if(extras == null) {
-                        categoryName = null;
-                    } else {
-                        categoryName = extras.getString(selectedCategory);
-                    }
-                } else {
-                    categoryName = (String) savedInstanceState.getSerializable(selectedCategory);
-                }
+                categoryName = intent.getStringExtra("category_name");
                 selectedCategoryTV.setText("Selected Category: " + categoryName);
-                int categoryCount = intent.getIntExtra("category_count",1);
-
+                questionCount = intent.getIntExtra("category_count",0);
+                germanWordsInCategory = intent.getStringArrayListExtra("german_words");
+                polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+                /*
                 Cursor wordsInCategory = getWordsInCategory(categoryName);
                 while(wordsInCategory.moveToNext()){
                     germanWordsInCategory.add(wordsInCategory.getString(0));
                     polishWordsInCategory.add(wordsInCategory.getString(1));
                 }
+                */
+                Log.v("TAG","questionCount: " + questionCount);
                 long seed = System.nanoTime();
                 Collections.shuffle(germanWordsInCategory, new Random(seed));
                 Collections.shuffle(polishWordsInCategory, new Random(seed));
-                germanWordsInCategory = new ArrayList<>(germanWordsInCategory.subList(0,categoryCount));
-                polishWordsInCategory = new ArrayList<>(polishWordsInCategory.subList(0,categoryCount));
+                germanWordsInCategory = new ArrayList<>(germanWordsInCategory.subList(0,questionCount));
+                polishWordsInCategory = new ArrayList<>(polishWordsInCategory.subList(0,questionCount));
                 ///////////////////////////
-                questionCount = categoryCount;
                 break;
             case "com.example.blazej.languagelearner.ReviewActivity":
                 questionCount = intent.getIntExtra("words_to_review_count",0);
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+                categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 long seed2 = System.nanoTime();
                 Collections.shuffle(germanWordsInCategory, new Random(seed2));
                 Collections.shuffle(polishWordsInCategory, new Random(seed2));
+                Collections.shuffle(categoriesOfWordsToReview, new Random(seed2));
+                categoriesOfWordsToReview = new ArrayList<>(categoriesOfWordsToReview.subList(0,questionCount));
                 germanWordsInCategory = new ArrayList<>(germanWordsInCategory.subList(0,questionCount));
                 polishWordsInCategory = new ArrayList<>(polishWordsInCategory.subList(0,questionCount));
                 categoryName = "";
@@ -185,11 +183,14 @@ public class LearningToPolishActivity extends AppCompatActivity {
         myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
         myIntent.putStringArrayListExtra("learned_words",learnedWords);
         myIntent.putStringArrayListExtra("missed_words",missedWords);
+        myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
+
         myIntent.putExtra("category_name",categoryName);
         myIntent.putExtra("account_name",accountName);
         Log.v("TAG", "Account Name: " + accountName+ " --- Selected Category: " + categoryName);
         startActivityForResult(myIntent,1);
     }
+
 
     Cursor getWordsInCategory(String category){
         return  myDB.query(WordListContract.DatabaseColumnsEntry.TABLE_NAME,

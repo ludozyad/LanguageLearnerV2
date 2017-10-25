@@ -28,7 +28,7 @@ public class ReviewActivity extends AppCompatActivity {
     ArrayList<String> wordsToReview = new ArrayList<>();
     ArrayList<String> germanWordsByAccount = new ArrayList<>();
     ArrayList<String> polishWordsByAccount = new ArrayList<>();
-    private SQLiteDatabase myWordsDB;
+    ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
     int wordsToReviewCount = 0;
 
     @Override
@@ -36,35 +36,44 @@ public class ReviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review);
         WordsDbHelper wordsDbHelper = new WordsDbHelper(this);
-        myWordsDB = wordsDbHelper.getWritableDatabase();
+        WordListContract.myWordsDB = wordsDbHelper.getWritableDatabase();
         numberPicker = (NumberPicker) findViewById(R.id.numberPicker2);
         sharedPref = getSharedPreferences(AccountListContract.sharedName,MODE_PRIVATE);
         accountName = sharedPref.getString(AccountListContract.sharedName,"XD");
         reviewCursor = WordAccountStatusContract.getWordAccountStatusCursorWithSpecificAccount(accountName);
 
         String[] wordsToReviewArray = new String[reviewCursor.getCount()];
-
+        String[] categoriesOfWordsToReviewArray = new String[reviewCursor.getCount()];
         if(reviewCursor.getCount() > 0) {
             while (reviewCursor.moveToNext()) {
                 wordsToReview.add(reviewCursor.getString(1));
+                categoriesOfWordsToReview.add(reviewCursor.getString(2));
             }
             wordsToReviewArray = wordsToReview.toArray(new String[wordsToReview.size()]);
+            categoriesOfWordsToReviewArray = categoriesOfWordsToReview.toArray(new String[categoriesOfWordsToReview.size()]);
         }else{
             Log.v("TAG", "reviewCursor pusty!!");
         }
 
+        for(int i=0; i<categoriesOfWordsToReview.size(); i++){
+            Log.v("TAG","categoriesOfWordsToReview: " + categoriesOfWordsToReview.get(i));
+        }
 
-        Cursor wordsToReview = getWordsByArray(wordsToReviewArray);
+        Cursor wordsToReview = WordListContract.getAllWordsByArray(wordsToReviewArray,categoriesOfWordsToReviewArray);
         if(wordsToReview.getCount() > 0) {
             while (wordsToReview.moveToNext()) {
+                Log.v("TAG","0: " + wordsToReview.getString(0));
+                Log.v("TAG","1: " + wordsToReview.getString(1));
+                Log.v("TAG","2: " + wordsToReview.getString(2));
+                Log.v("TAG","3: " + wordsToReview.getString(3));
+                Log.v("TAG","4: " + wordsToReview.getString(4));
                 germanWordsByAccount.add(wordsToReview.getString(1));
                 polishWordsByAccount.add(wordsToReview.getString(2));
             }
         }else{
             Log.v("TAG","Nie ma słów do powtórki!");
         }
-
-
+        wordsToReview.close();
         numberPicker.setMinValue(4);
         numberPicker.setMaxValue(reviewCursor.getCount());
     }
@@ -75,6 +84,7 @@ public class ReviewActivity extends AppCompatActivity {
         if(reviewCursor.getCount() > 3){
             myIntent.putStringArrayListExtra("german_words",germanWordsByAccount);
             myIntent.putStringArrayListExtra("polish_words",polishWordsByAccount);
+            myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
             myIntent.putExtra("words_to_review_count",wordsToReviewCount);
             startActivityForResult(myIntent,1);
         }else{
@@ -82,26 +92,5 @@ public class ReviewActivity extends AppCompatActivity {
         }
     }
 
-    public Cursor getWordsByArray(String[] wordList){
 
-        String whereClause = "";
-        for(int i=0; i<wordList.length; i++){
-            if(i == wordList.length-1){
-                whereClause += WordListContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME + " = ?";
-            }else {
-                whereClause += WordListContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME + " = ?" + " OR ";
-            }
-            //WordListContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME + "=?"
-        }
-        Log.v("TAG", whereClause);
-        return myWordsDB.query(
-                WordListContract.DatabaseColumnsEntry.TABLE_NAME,
-                null,
-                whereClause,
-                wordList,
-                null,
-                null,
-                null
-        );
-    }
 }

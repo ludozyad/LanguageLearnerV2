@@ -19,6 +19,7 @@ public class WordAccountStatusContract {
         public static final String COLUMN_IS_LEARNED = "is_learned_column";
         public static final String CATEGORY_COLUMN_NAME = "title_column";
     }
+
     public static Cursor getWordAccountStatusCursor(){
         return myIsLearnedDB.query
                 (DatabaseColumnsEntry.TABLE_NAME,
@@ -29,6 +30,19 @@ public class WordAccountStatusContract {
                 null,
                 null);
     }
+
+
+    public static Cursor getLearnedPolishWords(String accountName){  //because we have only polish words in this base
+        return  WordAccountStatusContract.myIsLearnedDB.query(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME,
+                new String[] {WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME},
+                WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = ? " + "AND " +
+                        WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED + " = ? ",
+                new String[] {accountName, "1"},
+                null,
+                null,
+                null);
+    }
+
 
     public static Cursor getWordAccountStatusCursorWithSpecificAccount(String accountName){
         return myIsLearnedDB.query
@@ -45,10 +59,11 @@ public class WordAccountStatusContract {
         Cursor cursor = getWordAccountStatusCursor();
             while(cursor.moveToNext()){
                 if(cursor.getString(1).equals(word)&&cursor.getString(2).equals(categoryName)&&cursor.getString(3).equals(accountName)){
+                    cursor.close();
                     return true;
                 }
             }
-        cursor.close();
+            cursor.close();
             return false;
     }
 }

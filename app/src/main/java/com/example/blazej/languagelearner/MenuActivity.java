@@ -31,7 +31,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int LOADER_ID = 1;
 
 
-    private SQLiteDatabase myWordsDB;
+    //private SQLiteDatabase myWordsDB;
     private ProgressBar spinner;
 
     @Override
@@ -41,7 +41,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
         spinner.setVisibility(View.GONE);
         WordsDbHelper wordsDbHelper = new WordsDbHelper(this);
-        myWordsDB = wordsDbHelper.getWritableDatabase();
+        WordListContract.myWordsDB = wordsDbHelper.getWritableDatabase();
         WordAccountStatusDbHelper isLearnerDbHelper = new WordAccountStatusDbHelper(this);
         WordAccountStatusContract.myIsLearnedDB = isLearnerDbHelper.getWritableDatabase();
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
@@ -57,9 +57,9 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 spinner.setVisibility(View.VISIBLE);
 
-                if (getTableCursor().getCount() != 0) {
+                if (WordListContract.getAllWordsTableCursor().getCount() != 0) {
                     Log.v(TAG,"getTableCursor().getCount()!=0 -- deliverResult");
-                    deliverResult(getTableCursor());
+                    deliverResult(WordListContract.getAllWordsTableCursor());
                 } else {
                     Log.v(TAG,"getTableCursor().getCount()==0 -- forceLoad");
                     forceLoad();
@@ -71,14 +71,14 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
                 Log.v(TAG,"loadInBackground()");
                 WordListContract.headingList = DownloadTask.downloadHeadingName(WordListContract.wordListUrl, WordListContract.categoriesHtmlPlace);
                 ArrayList<LinkedHashMap<String, String>> wordList = DownloadTask.downloadAllWords(WordListContract.wordListUrl, WordListContract.categoriesHtmlPlace, WordListContract.baseSiteUll, WordListContract.wordsTables);
-                WordsDbHelper.fillMyBase(WordListContract.headingList, wordList, myWordsDB);
-                return getTableCursor();
+                WordsDbHelper.fillMyBase(WordListContract.headingList, wordList, WordListContract.myWordsDB);
+                return WordListContract.getAllWordsTableCursor();
             }
 
             @Override
             public void deliverResult(Cursor data) {
                 Log.v(TAG,"deliverResult");
-                super.deliverResult(getTableCursor());
+                super.deliverResult(WordListContract.getAllWordsTableCursor());
             }
         };
     }
@@ -94,18 +94,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
         Log.v(TAG,"OnLoaderReset");
     }
 
-    public Cursor getTableCursor() {
-        Log.v(TAG,"getTableCursor()");
-        return this.myWordsDB.query(
-                WordListContract.DatabaseColumnsEntry.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                WordListContract.DatabaseColumnsEntry._ID
-        );
-    }
+
 
     public void onChooseCategoryClick(View view) {
         Intent intent = new Intent(this,ChooseCategoryActivity.class);

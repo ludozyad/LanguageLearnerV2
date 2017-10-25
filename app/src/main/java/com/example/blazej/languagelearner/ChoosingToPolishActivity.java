@@ -31,6 +31,7 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
     ArrayList<String> polishWordsInCategory = new ArrayList<>();
     ArrayList<String> learnedWords = new ArrayList<>();
     ArrayList<String> missedWords = new ArrayList<>();
+    ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
     String categoryName;
     Button nextQuestionBTN;
     Button ans1BTN;
@@ -71,6 +72,7 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
         Intent intent = getIntent();
         germanWordsInCategory = intent.getStringArrayListExtra("german_words");
         polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+        categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
         learnedWords = intent.getStringArrayListExtra("learned_words");
         missedWords = intent.getStringArrayListExtra("missed_words");
         accountName = intent.getStringExtra("account_name");
@@ -154,6 +156,7 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
         myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
         myIntent.putStringArrayListExtra("learned_words",learnedWords);
         myIntent.putStringArrayListExtra("missed_words",missedWords);
+        myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
         myIntent.putExtra("category_name",categoryName);
         myIntent.putExtra("account_name",accountName);
         Log.v("TAG", "Account Name: " + accountName+ " --- Selected Category: " + categoryName);
