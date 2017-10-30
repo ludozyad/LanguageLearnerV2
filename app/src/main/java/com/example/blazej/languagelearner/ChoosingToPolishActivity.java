@@ -31,6 +31,8 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
     ArrayList<String> polishWordsInCategory = new ArrayList<>();
     ArrayList<String> learnedWords = new ArrayList<>();
     ArrayList<String> missedWords = new ArrayList<>();
+    ArrayList<String> learnedWordsCategory = new ArrayList<>();
+    ArrayList<String> missedWordsCategory = new ArrayList<>();
     ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
     String categoryName;
     Button nextQuestionBTN;
@@ -75,14 +77,17 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
         categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
         learnedWords = intent.getStringArrayListExtra("learned_words");
         missedWords = intent.getStringArrayListExtra("missed_words");
+        learnedWordsCategory = intent.getStringArrayListExtra("learned_words_category");
+        missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
         accountName = intent.getStringExtra("account_name");
-        categoryName = intent.getStringExtra("category_name");
+        //categoryName = intent.getStringExtra("category_name");
         //////////////////////////////
 
         long seed = System.nanoTime();
         Collections.shuffle(germanWordsInCategory, new Random(seed));
         Collections.shuffle(polishWordsInCategory, new Random(seed));
-        selectedCategoryTV.setText(categoryName);
+        Collections.shuffle(categoriesOfWordsToReview, new Random(seed));
+        //selectedCategoryTV.setText(categoryName);
         questionCount = germanWordsInCategory.size();
 
         questionCore(questionCount,currentQuestion);
@@ -92,6 +97,8 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
         if(currentQuestion <= questionCount){
             whichQuestionTV.setText(currentQuestion + " of " + questionCount);
             int index = currentQuestion - 1;
+            categoryName = categoriesOfWordsToReview.get(index);
+            selectedCategoryTV.setText("Selected Category: " + categoryName);
             // To co mamy przetlumaczyć
             germanWord = germanWordsInCategory.get(index);
             // Dobra odpowiedz
@@ -156,8 +163,10 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
         myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
         myIntent.putStringArrayListExtra("learned_words",learnedWords);
         myIntent.putStringArrayListExtra("missed_words",missedWords);
+        myIntent.putStringArrayListExtra("learned_words_category",learnedWordsCategory);
+        myIntent.putStringArrayListExtra("missed_words_category",missedWordsCategory);
         myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
-        myIntent.putExtra("category_name",categoryName);
+        //myIntent.putExtra("category_name",categoryName);
         myIntent.putExtra("account_name",accountName);
         Log.v("TAG", "Account Name: " + accountName+ " --- Selected Category: " + categoryName);
         startActivityForResult(myIntent,1);
@@ -165,14 +174,17 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
 
     @Override
     public void onClick(View v) {
+        int index = currentQuestion - 1;
         switch(v.getId()){
             case R.id.ans1BTN:
                 if(goodAnsIndex == 0){
                     learnedWords.add(rightAnswer);
+                    learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText("Your answer: " + ans1BTN.getText());
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
                     missedWords.add(rightAnswer);
+                    missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText("Your answer: " + ans1BTN.getText());
                     yourAnswerTV.setTextColor(Color.RED);
                 }
@@ -188,10 +200,12 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
             case R.id.ans2BTN:
                 if(goodAnsIndex == 1){
                     learnedWords.add(rightAnswer);
+                    learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText("Your answer: " + ans2BTN.getText());
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
                     missedWords.add(rightAnswer);
+                    missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText("Your answer: " + ans2BTN.getText());
                     yourAnswerTV.setTextColor(Color.RED);
                 }
@@ -207,10 +221,12 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
             case R.id.ans3BTN:
                 if(goodAnsIndex == 2){
                     learnedWords.add(rightAnswer);
+                    learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText("Your answer: " + ans3BTN.getText());
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
                     missedWords.add(rightAnswer);
+                    missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText("Your answer: " + ans3BTN.getText());
                     yourAnswerTV.setTextColor(Color.RED);
                 }
@@ -226,10 +242,12 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
             case R.id.ans4BTN:
                 if(goodAnsIndex == 3){
                     learnedWords.add(rightAnswer);
+                    learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText("Your answer: " + ans4BTN.getText());
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
                     missedWords.add(rightAnswer);
+                    missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText("Your answer: " + ans4BTN.getText());
                     yourAnswerTV.setTextColor(Color.RED);
                 }

@@ -84,7 +84,7 @@ public class WordListContract {
     public static Cursor getAllWordsByArray(String[] wordList, String[] categoryNames){
 
         String[] wordListAndCategoryNames = joinArrayGeneric(wordList,categoryNames);
-
+        Log.v("TAG", "wordListAndCategoryNames: " + wordListAndCategoryNames.length);
 
         String whereClause = "( ";
         if(wordList.length > 0) {
@@ -96,8 +96,8 @@ public class WordListContract {
                 }
             }
             whereClause += ") AND (";
-            for (int i = 0; i < wordList.length; i++) {
-                if (i == wordList.length - 1) {
+            for (int j = 0; j < wordList.length; j++) {
+                if (j == wordList.length - 1) {
                     whereClause += DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = ?";
                 } else {
                     whereClause += DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = ?" + " OR ";
@@ -106,6 +106,9 @@ public class WordListContract {
             whereClause += " )";
 
             Log.v("TAG", "where Clause: " + whereClause);
+            for(int k = 0; k<wordListAndCategoryNames.length;k++){
+                Log.v("TAG","wordListAndCategoryNames: " + wordListAndCategoryNames[k]);
+            }
             return myWordsDB.query(
                     WordListContract.DatabaseColumnsEntry.TABLE_NAME,
                     null,

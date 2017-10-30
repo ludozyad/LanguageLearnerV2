@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.blazej.languagelearner.data.AccountListContract;
 import com.example.blazej.languagelearner.data.WordAccountStatusContract;
@@ -34,6 +35,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
     ArrayList<String> germanWordsToLearnArray;
     ArrayList<String> polishWordsToLearnArray;
     ArrayList<String> categoriesOfWordsArrayList = new ArrayList<>();
+    Button obtainNumberBTN;
     ListView categoriesListView;
     NumberPicker numberPicker;
     TextView chooseCategoryTV;
@@ -53,8 +55,8 @@ public class ChooseCategoryActivity extends AppCompatActivity {
         categoriesListView = (ListView) findViewById(R.id.categoriesListView);
         numberPicker = (NumberPicker) findViewById(R.id.numberPicker);
         categoryCountBTN = (Button)findViewById(R.id.startLearningActivityBTN);
+        obtainNumberBTN = (Button)findViewById(R.id.checkNumberBTN);
         categoryCountBTN.setVisibility(View.INVISIBLE);
-
         Cursor myCategories = WordListContract.getAllCategories();
 
         ArrayList<String> categoriesNames = new ArrayList<>();
@@ -68,15 +70,10 @@ public class ChooseCategoryActivity extends AppCompatActivity {
         categoriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                obtainNumberBTN.setVisibility(View.VISIBLE);
                 TextView ed = (TextView) view.findViewById(android.R.id.text1);
                 categoryName = ed.getText().toString();
                 chooseCategoryTV.setText("Chosen Category: " + categoryName);
-                numberPicker.setMinValue(4);
-                numberPicker.setMaxValue(WordListContract.getCategoryCount(categoryName));
-                selectedCategoryCount = numberPicker.getValue();
-                Log.v("TAG","selectedCategoryCount: " + selectedCategoryCount);
-                categoryCountBTN.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -84,15 +81,30 @@ public class ChooseCategoryActivity extends AppCompatActivity {
 
 
     public void obtainWordsToLearn(){
+        allPolishWordsInCategoryArrayList.clear();
+        allGermanWordsInCategoryArrayList.clear();
+        polishWordsLearnedArrayList.clear();
+        germanWordsLearnedArrayList.clear();
+        categoriesOfWordsArrayList.clear();
+
         Cursor wordsInCategory = WordListContract.getWordsInCategory(categoryName);
         while(wordsInCategory.moveToNext()) {
             allGermanWordsInCategoryArrayList.add(wordsInCategory.getString(0));
             allPolishWordsInCategoryArrayList.add(wordsInCategory.getString(1));
         }
         Cursor polishLearnedWordsCursor = WordAccountStatusContract.getLearnedPolishWords(accountName);
-        while(wordsInCategory.moveToNext()) {
-            polishWordsLearnedArrayList.add(wordsInCategory.getString(0));
-            categoriesOfWordsArrayList.add(categoryName);
+        Log.v("TAG", "polishLearnedWordsCursor size: " + polishLearnedWordsCursor.getCount());
+        while(polishLearnedWordsCursor.moveToNext()) {
+            Log.v("TAG", "wordsInCategory.getString(0): " + polishLearnedWordsCursor.getString(0));
+            polishWordsLearnedArrayList.add(polishLearnedWordsCursor.getString(0));
+        }
+        //for(int i=0;i<categoriesOfWordsArrayList.size();i++){
+         //   Log.v("TAG","categoriesOfWordsArrayList!@!@!@!@: " + categoriesOfWordsArrayList.get(i));
+        //}
+
+
+        for(int i=0; i<polishWordsLearnedArrayList.size(); i++){
+            Log.v("TAG", "Słowo: " + i + " -- " + polishWordsLearnedArrayList.get(i));
         }
         String[] polishWordsLearnedArray = new String[polishLearnedWordsCursor.getCount()];
         String[] categoriesOfWordsArray = new String[polishLearnedWordsCursor.getCount()];
@@ -117,19 +129,46 @@ public class ChooseCategoryActivity extends AppCompatActivity {
         allPolishWordsInCategoryArrayList.removeAll(polishWordsLearnedArrayList);
         germanWordsToLearnArray = allGermanWordsInCategoryArrayList;
         polishWordsToLearnArray = allPolishWordsInCategoryArrayList;
+        for(int i=0;i<germanWordsToLearnArray.size();i++){
+            categoriesOfWordsArrayList.add(categoryName);
+            Log.v("TAG","germanWordsToLearnArray: " + germanWordsToLearnArray.get(i));
+        }
+        for(int i=0;i<polishWordsToLearnArray.size();i++){
+            Log.v("TAG","polishWordsToLearnArray: " + polishWordsToLearnArray.get(i));
+        }
+
        // Log.v("TAG","germanWordsToLearnArray size: " + germanWordsToLearnArray.size());
        // Log.v("TAG","polishWordsToLearnArray size: " + polishWordsToLearnArray.size());
     }
 
     public void startLearningActivity(View view) {
-        obtainWordsToLearn();
-        Intent myIntent = new Intent(getApplicationContext(), LearningToPolishActivity.class);
-        myIntent.putExtra("category_name", categoryName);
-        myIntent.putExtra("category_count", selectedCategoryCount);
-        myIntent.putStringArrayListExtra("german_words",germanWordsToLearnArray);
-        myIntent.putStringArrayListExtra("polish_words",polishWordsToLearnArray);
-        startActivityForResult(myIntent,1);
+        selectedCategoryCount = numberPicker.getValue();
+        if(selectedCategoryCount < 4){
+            Toast.makeText(this,"Za mało słów do nauki, wybierz inną kategorię.",Toast.LENGTH_SHORT).show();
+        }else {
+            Intent myIntent = new Intent(getApplicationContext(), LearningToPolishActivity.class);
+            myIntent.putExtra("category_name", categoryName);
+            myIntent.putExtra("category_count", selectedCategoryCount);
+            myIntent.putStringArrayListExtra("german_words", germanWordsToLearnArray);
+            myIntent.putStringArrayListExtra("polish_words", polishWordsToLearnArray);
+            myIntent.putStringArrayListExtra("word_category", categoriesOfWordsArrayList);
+            Log.v("TAG","germanWordsToLearnArray: "+germanWordsToLearnArray.size() + " polishWordsToLearnArray: " + polishWordsToLearnArray.size() + " categoriesOfWordsArrayList.size(): " + categoriesOfWordsArrayList.size());
+            startActivityForResult(myIntent, 1);
+        }
         //TODO Sprawdzic czy to ma prawo działać i ew dodać wydobycie do LearningToPolishActivity (na pewno trza posprawdzać arraye)
+    }
+
+    public void onCheckNumberBTNClick(View view) {
+        obtainWordsToLearn();
+        if(germanWordsToLearnArray.size() > 4) {
+            numberPicker.setMinValue(4);
+            numberPicker.setMaxValue(germanWordsToLearnArray.size());
+        }else {
+            numberPicker.setValue(0);
+        }
+        obtainNumberBTN.setVisibility(View.INVISIBLE);
+        categoryCountBTN.setVisibility(View.VISIBLE);
+        Log.v("TAG","selectedCategoryCount: " + selectedCategoryCount);
     }
 }
 

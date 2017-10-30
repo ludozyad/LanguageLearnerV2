@@ -27,4 +27,5 @@
     <string name="listen">Listen</string>
     <string name="powtorki">Powtórki</string>
     <string name="rozpocznij_powtorki">Rozpocznij powtórki</string>
+    <string name="check_number">Check Number</string>
 </resources>

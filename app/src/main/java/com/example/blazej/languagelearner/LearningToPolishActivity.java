@@ -32,7 +32,7 @@ public class LearningToPolishActivity extends AppCompatActivity {
     SharedPreferences sharedPref;
     String accountName;
     String callingActivity;
-    public String selectedCategory = "category";
+    //public String selectedCategory = "category";
     TextView selectedCategoryTV;
     TextView whichQuestionTV;
     TextView toLearnWordTV;
@@ -48,6 +48,8 @@ public class LearningToPolishActivity extends AppCompatActivity {
     int currentQuestion;
     ArrayList<String> germanWordsInCategory = new ArrayList<>();
     ArrayList<String> polishWordsInCategory = new ArrayList<>();
+    ArrayList<String> learnedWordsCategory = new ArrayList<>();
+    ArrayList<String> missedWordsCategory = new ArrayList<>();
     ArrayList<String> learnedWords = new ArrayList<>();
     ArrayList<String> missedWords = new ArrayList<>();
     ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
@@ -83,11 +85,12 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 WordsDbHelper myDBHelper = new WordsDbHelper(this);
                 myDB = myDBHelper.getWritableDatabase();
                 wordAccountStatusCursor = WordAccountStatusContract.getWordAccountStatusCursor();
-                categoryName = intent.getStringExtra("category_name");
+                //categoryName = intent.getStringExtra("category_name");
                 selectedCategoryTV.setText("Selected Category: " + categoryName);
                 questionCount = intent.getIntExtra("category_count",0);
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+                categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 /*
                 Cursor wordsInCategory = getWordsInCategory(categoryName);
                 while(wordsInCategory.moveToNext()){
@@ -99,15 +102,21 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 long seed = System.nanoTime();
                 Collections.shuffle(germanWordsInCategory, new Random(seed));
                 Collections.shuffle(polishWordsInCategory, new Random(seed));
+                Collections.shuffle(categoriesOfWordsToReview, new Random(seed));
+                categoriesOfWordsToReview = new ArrayList<>(categoriesOfWordsToReview.subList(0,questionCount));
                 germanWordsInCategory = new ArrayList<>(germanWordsInCategory.subList(0,questionCount));
                 polishWordsInCategory = new ArrayList<>(polishWordsInCategory.subList(0,questionCount));
                 ///////////////////////////
                 break;
             case "com.example.blazej.languagelearner.ReviewActivity":
                 questionCount = intent.getIntExtra("words_to_review_count",0);
+                Log.v("TAG","questionCount: " + questionCount);
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
+                Log.v("TAG","germanWordsInCategory: " + germanWordsInCategory.size());
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+                Log.v("TAG","polishWordsInCategory: " + polishWordsInCategory.size());
                 categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
+                Log.v("TAG","categoriesOfWordsToReview: " + categoriesOfWordsToReview.size());
                 long seed2 = System.nanoTime();
                 Collections.shuffle(germanWordsInCategory, new Random(seed2));
                 Collections.shuffle(polishWordsInCategory, new Random(seed2));
@@ -115,7 +124,14 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 categoriesOfWordsToReview = new ArrayList<>(categoriesOfWordsToReview.subList(0,questionCount));
                 germanWordsInCategory = new ArrayList<>(germanWordsInCategory.subList(0,questionCount));
                 polishWordsInCategory = new ArrayList<>(polishWordsInCategory.subList(0,questionCount));
-                categoryName = "";
+
+                Log.v("TAG","TU WCHODZIMY DO LEARNINGTOPOLISH!@!@#@#");
+                for(int i=0;i<categoriesOfWordsToReview.size();i++){
+                    Log.v("TAG","categoriesOfWordsToReview: " + categoriesOfWordsToReview.get(i));
+                    Log.v("TAG","germanWordsInCategory: " + germanWordsInCategory.get(i));
+                    Log.v("TAG","polishWordsInCategory: " + polishWordsInCategory.get(i));
+                }
+                //categoryName = "";
                 break;
         }
         currentQuestion = 1;
@@ -127,6 +143,8 @@ public class LearningToPolishActivity extends AppCompatActivity {
         if(currentQuestion <= questionCount){
             whichQuestionTV.setText(currentQuestion + " of " + questionCount);
             int index = currentQuestion - 1;
+            categoryName = categoriesOfWordsToReview.get(index);
+            selectedCategoryTV.setText("Selected Category: " + categoryName);
             germanWord = germanWordsInCategory.get(index);
             toLearnWordTV.setText(germanWord);
         }else{
@@ -156,12 +174,14 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 yourAnswerTV.setText("Your Answer: " + yourAnswer);
                 rightAnswerTV.setText("Right Answer: " + rightAnswer);
                 learnedWords.add(rightAnswer);
+                learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
                 yourAnswerTV.setTextColor(Color.GREEN);
             }else{
                 Toast.makeText(this, "Błędna Odpowiedź!", Toast.LENGTH_SHORT).show();
                 yourAnswerTV.setText("Your Answer: " + yourAnswer);
                 rightAnswerTV.setText("Right Answer: " + rightAnswer);
                 missedWords.add(rightAnswer);
+                missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                 yourAnswerTV.setTextColor(Color.RED);
             }
             rightAnswerTV.setVisibility(View.VISIBLE);
@@ -183,9 +203,12 @@ public class LearningToPolishActivity extends AppCompatActivity {
         myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
         myIntent.putStringArrayListExtra("learned_words",learnedWords);
         myIntent.putStringArrayListExtra("missed_words",missedWords);
+        myIntent.putStringArrayListExtra("learned_words_category",learnedWordsCategory);
+        myIntent.putStringArrayListExtra("missed_words_category",missedWordsCategory);
+
         myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
 
-        myIntent.putExtra("category_name",categoryName);
+        //myIntent.putExtra("category_name",categoryName);
         myIntent.putExtra("account_name",accountName);
         Log.v("TAG", "Account Name: " + accountName+ " --- Selected Category: " + categoryName);
         startActivityForResult(myIntent,1);

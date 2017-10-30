@@ -37,6 +37,8 @@ public class LearningToGermanActivity extends AppCompatActivity {
     ArrayList<String> polishWordsInCategory = new ArrayList<>();
     ArrayList<String> learnedWords = new ArrayList<>();
     ArrayList<String> missedWords = new ArrayList<>();
+    ArrayList<String> learnedWordsCategory = new ArrayList<>();
+    ArrayList<String> missedWordsCategory = new ArrayList<>();
     ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
     String categoryName;
     String accountName;
@@ -64,16 +66,19 @@ public class LearningToGermanActivity extends AppCompatActivity {
         polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
         learnedWords = intent.getStringArrayListExtra("learned_words");
         missedWords = intent.getStringArrayListExtra("missed_words");
+        learnedWordsCategory = intent.getStringArrayListExtra("learned_words_category");
+        missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
         accountName = intent.getStringExtra("account_name");
-        categoryName = intent.getStringExtra("category_name");
+        //categoryName = intent.getStringExtra("category_name");
         categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
         //////////////////////////////
 
         long seed = System.nanoTime();
         Collections.shuffle(germanWordsInCategory, new Random(seed));
         Collections.shuffle(polishWordsInCategory, new Random(seed));
-        categoryName = intent.getStringExtra("category_name");
-        selectedCategoryTV.setText(categoryName);
+        Collections.shuffle(categoriesOfWordsToReview, new Random(seed));
+        //categoryName = intent.getStringExtra("category_name");
+        //selectedCategoryTV.setText(categoryName);
         questionCount = germanWordsInCategory.size();
         wordAccountStatusCursor = WordAccountStatusContract.getWordAccountStatusCursor();
         //TODO sprawdzic czy dziala XD
@@ -84,6 +89,8 @@ public class LearningToGermanActivity extends AppCompatActivity {
         if(currentQuestion <= questionCount){
             whichQuestionTV.setText(currentQuestion + " of " + questionCount);
             int index = currentQuestion - 1;
+            categoryName = categoriesOfWordsToReview.get(index);
+            selectedCategoryTV.setText("Selected Category: " + categoryName);
             polishWord = polishWordsInCategory.get(index);
             toLearnWordTV.setText(polishWord);
         }else{
@@ -113,12 +120,14 @@ public class LearningToGermanActivity extends AppCompatActivity {
                 yourAnswerTV.setText("Your Answer: " + yourAnswer);
                 rightAnswerTV.setText("Right Answer: " + rightAnswer);
                 learnedWords.add(polishWord);
+                learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
                 yourAnswerTV.setTextColor(Color.GREEN);
             }else{
                 Toast.makeText(this, "Błędna Odpowiedź!", Toast.LENGTH_SHORT).show();
                 yourAnswerTV.setText("Your Answer: " + yourAnswer);
                 rightAnswerTV.setText("Right Answer: " + rightAnswer);
                 missedWords.add(polishWord);
+                missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                 yourAnswerTV.setTextColor(Color.RED);
             }
             rightAnswerTV.setVisibility(View.VISIBLE);
@@ -139,8 +148,10 @@ public class LearningToGermanActivity extends AppCompatActivity {
         myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
         myIntent.putStringArrayListExtra("learned_words",learnedWords);
         myIntent.putStringArrayListExtra("missed_words",missedWords);
+        myIntent.putStringArrayListExtra("learned_words_category",learnedWordsCategory);
+        myIntent.putStringArrayListExtra("missed_words_category",missedWordsCategory);
         myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
-        myIntent.putExtra("category_name",categoryName);
+        //myIntent.putExtra("category_name",categoryName);
         myIntent.putExtra("account_name",accountName);
         Log.v("TAG", "Account Name: " + accountName+ " --- Selected Category: " + categoryName);
         startActivityForResult(myIntent,1);

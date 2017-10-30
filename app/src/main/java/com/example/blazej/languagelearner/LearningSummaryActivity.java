@@ -13,6 +13,8 @@ import android.view.View;
 import com.example.blazej.languagelearner.data.WordAccountStatusContract;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,7 +28,10 @@ public class LearningSummaryActivity extends AppCompatActivity {
     ArrayList<String> polishWordsInCategory = new ArrayList<>();
     ArrayList<String> learnedWords = new ArrayList<>();
     ArrayList<String> missedWords = new ArrayList<>();
+    ArrayList<String> learnedWordsCategory = new ArrayList<>();
+    ArrayList<String> missedWordsCategory = new ArrayList<>();
     ArrayList<String> reallyLearnedWords = new ArrayList<>();
+    ArrayList<String> reallyLearnedCategories = new ArrayList<>();
     ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
     //Cursor cursor;
     String categoryName;
@@ -51,7 +56,9 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 learnedWords = intent.getStringArrayListExtra("learned_words");
                 missedWords = intent.getStringArrayListExtra("missed_words");
-                categoryName = intent.getStringExtra("category_name");
+                learnedWordsCategory = intent.getStringArrayListExtra("learned_words_category");
+                missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
+                //categoryName = intent.getStringExtra("category_name");
 
                 break;
             case "com.example.blazej.languagelearner.LearningToPolishActivity":
@@ -61,7 +68,9 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 learnedWords = intent.getStringArrayListExtra("learned_words");
                 missedWords = intent.getStringArrayListExtra("missed_words");
-                categoryName = intent.getStringExtra("category_name");
+                learnedWordsCategory = intent.getStringArrayListExtra("learned_words_category");
+                missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
+                //categoryName = intent.getStringExtra("category_name");
 
                 break;
             case "com.example.blazej.languagelearner.ChoosingToPolishActivity":
@@ -71,7 +80,9 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 learnedWords = intent.getStringArrayListExtra("learned_words");
                 missedWords = intent.getStringArrayListExtra("missed_words");
-                categoryName = intent.getStringExtra("category_name");
+                learnedWordsCategory = intent.getStringArrayListExtra("learned_words_category");
+                missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
+                //categoryName = intent.getStringExtra("category_name");
 
                 break;
             case "com.example.blazej.languagelearner.ChoosingToGermanActivity":
@@ -81,7 +92,9 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 learnedWords = intent.getStringArrayListExtra("learned_words");
                 missedWords = intent.getStringArrayListExtra("missed_words");
-                categoryName = intent.getStringExtra("category_name");
+                learnedWordsCategory = intent.getStringArrayListExtra("learned_words_category");
+                missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
+                //categoryName = intent.getStringExtra("category_name");
 
                 break;
             case "com.example.blazej.languagelearner.ListenActivity":
@@ -102,22 +115,41 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
                 learnedWords = intent.getStringArrayListExtra("learned_words");
                 missedWords = intent.getStringArrayListExtra("missed_words");
-                categoryName = intent.getStringExtra("category_name");
+                learnedWordsCategory = intent.getStringArrayListExtra("learned_words_category");
+                missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
+                //categoryName = intent.getStringExtra("category_name");
 
-                reallyLearnedWords = countToFive(learnedWords);
+                for(int i=0; i<missedWords.size();i++){
+                    Log.v("TAG", "missedWords: " + missedWords.get(i));
+                    Log.v("TAG", "missedWordsCategory: " + missedWordsCategory.get(i));
+                }
+
+                for(int i=0; i<learnedWords.size();i++){
+                    Log.v("TAG", "learnedWords: " + learnedWords.get(i));
+                    Log.v("TAG", "learnedWordsCategory: " + learnedWordsCategory.get(i));
+                }
+
+
+                countToFive(learnedWords,learnedWordsCategory);
+                removeDuplicatesOfMissedWords(missedWords,missedWordsCategory);
                 //cursor = WordAccountStatusContract.getWordAccountStatusCursor();
                 if(reallyLearnedWords.size()>0) {
                     addLearnedWordsToBase(reallyLearnedWords);
                 }
-                ArrayList<String> missedWordsTemp = new ArrayList<>();
-                if(missedWords.size() > 0){
-                    Set<String> hs = new HashSet<>();
-                    hs.addAll(missedWords);
-                    missedWordsTemp.clear();
-                    missedWordsTemp.addAll(hs);
-                    addUnLearnedWordsToBase(missedWordsTemp);
+                if(missedWords.size()>0) {
+                    addUnLearnedWordsToBase(missedWords);
                 }
-                //////////////////////////////
+
+                /////////////////////to zle dziala
+               // ArrayList<String> missedWordsTemp = new ArrayList<>();
+               // if(missedWords.size() > 0){
+               //     Set<String> hs = new HashSet<>();
+                //    hs.addAll(missedWords);
+                //    missedWordsTemp.clear();
+                 //   missedWordsTemp.addAll(hs);
+
+                //////////////////////////////////
+
                 Cursor cursor = WordAccountStatusContract.getWordAccountStatusCursor();
                 if(cursor.getCount() > 0){
                     while(cursor.moveToNext()){
@@ -132,32 +164,107 @@ public class LearningSummaryActivity extends AppCompatActivity {
 
     }
 
+    private void removeDuplicatesOfMissedWords(ArrayList<String> missedWords,ArrayList<String> missedWordsCategory){
+        ArrayList<String> missedWordsTemp = new ArrayList<>();
+        ArrayList<String> catOfWordsTemp = new ArrayList<>();
+        Log.v("TAG", "missedWords: " + missedWords.size());
 
-    private void addUnLearnedWordsToBase(ArrayList<String> reallyUnLearnedWords){
-        Log.v("TAG", "unlearnedwords size: " + reallyUnLearnedWords.size());
-        for(int i=0; i < reallyUnLearnedWords.size(); i++) {
-            if (categoriesOfWordsToReview.size() > 0){
-                categoryName = categoriesOfWordsToReview.get(i);
+        missedWordsTemp.add(missedWords.get(0));
+        catOfWordsTemp.add(missedWordsCategory.get(0));
+
+        for(int i=0; i < missedWords.size(); i++){
+            if(!missedWordsTemp.contains(missedWords.get(i))){
+                missedWordsTemp.add(missedWords.get(i));
+                catOfWordsTemp.add(missedWordsCategory.get(i));
+            }
+        }
+        for(int i=0;i<missedWordsTemp.size();i++){
+            Log.v("TAG","missedWordsTemp: " + missedWordsTemp.get(i));
+        }
+        for(int i=0;i<catOfWordsTemp.size();i++){
+            Log.v("TAG","catOfWordsTemp: " + catOfWordsTemp.get(i));
+        }
+        this.missedWords.clear();
+        this.missedWords = missedWordsTemp;
+        this.missedWordsCategory.clear();
+        this.missedWordsCategory = catOfWordsTemp;
+    }
+
+    private void addUnLearnedWordsToBase(ArrayList<String> missedWords){
+        Log.v("TAG", "unlearnedwords size: " + missedWords.size());
+        for(int i=0; i < missedWords.size(); i++) {
+            if (missedWordsCategory.size() > 0){
+                categoryName = missedWordsCategory.get(i);
             }
             Log.v("TAG", "Category name: " + categoryName);
-            if (!WordAccountStatusContract.ifWordAccountStatusCursorContain(reallyUnLearnedWords.get(i),categoryName,accountName)) {
-                Log.v("TAG", "znalezione słowo nie posiada duplikatu, dodajemy: " + reallyUnLearnedWords.get(i));
+            if (WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,1)) {
+                Log.v("TAG", "Baza zawiera takie słowo, ale jest nauczone - zmieniamy na zapomniane(wtf): " + missedWords.get(i));
                 ContentValues cv = new ContentValues();
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, reallyUnLearnedWords.get(i));
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, missedWords.get(i));
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED, 0);
+                String whereClause = WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = "  + "'" + categoryName+ "'"  + " AND " +
+                        WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = " + "'" + accountName +  "'" + " AND " +
+                        WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME +   " = " +  "'" + missedWords.get(i) + "'";
+                WordAccountStatusContract.myIsLearnedDB.update(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME,cv,whereClause,null);
+                cv.clear();
+            }else if (WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,0)){
+                Log.v("TAG", "Baza zawiera takie nienauczone słowo: " + missedWords.get(i));
+            }else if ((!WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,1)) ||
+                    (!WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,0))) {
+                Log.v("TAG", "Baza nie zawiera takiego słowa, dodajemy jako nienauczone: " + missedWords.get(i));
+                ContentValues cv = new ContentValues();
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, missedWords.get(i));
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED, 0);
+                WordAccountStatusContract.myIsLearnedDB.insert(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME, null, cv);
+                cv.clear();
+            }
+            /*
+            if (!WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,0)) {
+                Log.v("TAG", "<addUnLearnedWordsToBase> znalezione słowo nie posiada duplikatu, dodajemy: " + missedWords.get(i));
+                ContentValues cv = new ContentValues();
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, missedWords.get(i));
                 cv.put(WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
                 cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
                 cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED, 0);
                 WordAccountStatusContract.myIsLearnedDB.insert(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME, null, cv);
                 cv.clear();
             }else{
-                Log.v("TAG", "znalezione słowo posiada już duplikat: " + reallyUnLearnedWords.get(i));
+                Log.v("TAG", "<addUnLearnedWordsToBase> znalezione słowo posiada już duplikat: " + missedWords.get(i));
             }
+            */
         }
     }
 
     private void addLearnedWordsToBase(ArrayList<String> reallyLearnedWords) {
+        Log.v("TAG","reallyLearnedWords size: " + reallyLearnedWords.size());
+        Log.v("TAG","reallyLearnedCategories size: " + reallyLearnedCategories.size());
+
         for(int i=0; i < reallyLearnedWords.size(); i++) {
-            if (!WordAccountStatusContract.ifWordAccountStatusCursorContain(reallyLearnedWords.get(i),categoryName,accountName)) {
+            if (reallyLearnedCategories.size() > 0) {
+                categoryName = reallyLearnedCategories.get(i);
+            }
+            Log.v("TAG", "reallyLearnedWords: " + reallyLearnedWords.get(i));
+            if (WordAccountStatusContract.ifWordAccountStatusCursorContain(reallyLearnedWords.get(i),categoryName,accountName,0)) {
+                Log.v("TAG", "Baza zawiera takie słowo, ale jest nienauczone: " + reallyLearnedWords.get(i));
+                ContentValues cv = new ContentValues();
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, reallyLearnedWords.get(i));
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED, 1);
+                String whereClause = WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = "  + "'" + categoryName+ "'"  + " AND " +
+                        WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = " + "'" + accountName +  "'" + " AND " +
+                        WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME +   " = " +  "'" + reallyLearnedWords.get(i) + "'";
+                WordAccountStatusContract.myIsLearnedDB.update(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME,cv,whereClause,null);
+                cv.clear();
+            }else if (WordAccountStatusContract.ifWordAccountStatusCursorContain(reallyLearnedWords.get(i),categoryName,accountName,1)){
+                Log.v("TAG", "Baza zawiera takie nauczone słowo: " + reallyLearnedWords.get(i));
+            }else if ((!WordAccountStatusContract.ifWordAccountStatusCursorContain(reallyLearnedWords.get(i),categoryName,accountName,1)) ||
+            (!WordAccountStatusContract.ifWordAccountStatusCursorContain(reallyLearnedWords.get(i),categoryName,accountName,0))) {
+                Log.v("TAG", "Baza nie zawiera takiego słowa, dodajemy jako nauczone: " + reallyLearnedWords.get(i));
                 ContentValues cv = new ContentValues();
                 cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, reallyLearnedWords.get(i));
                 cv.put(WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
@@ -169,19 +276,38 @@ public class LearningSummaryActivity extends AppCompatActivity {
         }
     }
 
-    private ArrayList<String> countToFive(ArrayList learnedWords){
+    private void countToFive(ArrayList<String> learnedWords,ArrayList<String> learnedWordsCategory){
+        for(int i=0;i<learnedWords.size();i++){
+            if(Collections.frequency(learnedWords,learnedWords.get(i)) > 4){
+               if(!reallyLearnedWords.contains(learnedWords.get(i))) {
+                   reallyLearnedWords.add(learnedWords.get(i));
+                   reallyLearnedCategories.add(learnedWordsCategory.get(i));
+               }
+            }
+        }
+
+        for(int i=0;i<reallyLearnedWords.size();i++){
+            Log.v("TAG", "reallyLearnedWords: " + reallyLearnedWords.get(i));
+        }
+        for(int i=0;i<reallyLearnedCategories.size();i++){
+            Log.v("TAG", "reallyLearnedCategories: " + reallyLearnedCategories.get(i));
+        }
+        /*
         Map<String, Integer> occurrences = new HashMap<>();
-        ArrayList<String> reallyLearnedWords = new ArrayList<>();
+
         for (int i=0; i<learnedWords.size(); i++) {
             occurrences.put(learnedWords.get(i).toString(), occurrences.containsKey(learnedWords.get(i).toString())
                     ? occurrences.get(learnedWords.get(i).toString()) + 1 : 1);
         }
+        Collections.frequency(learnedWordsCategory,"s");
         for (Map.Entry<String, Integer> entry : occurrences.entrySet()) {
             if(entry.getValue().equals(5)){
                 reallyLearnedWords.add(entry.getKey());
             }
         }
-        return reallyLearnedWords;
+        */
+        // reallyLearnedCategories =
+        // reallyLearnedWords =
     }
 
     public void nextCategory(View view) {
@@ -192,8 +318,10 @@ public class LearningSummaryActivity extends AppCompatActivity {
             myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
             myIntent.putStringArrayListExtra("learned_words",learnedWords);
             myIntent.putStringArrayListExtra("missed_words",missedWords);
+            myIntent.putStringArrayListExtra("learned_words_category",learnedWordsCategory);
+            myIntent.putStringArrayListExtra("missed_words_category",missedWordsCategory);
             myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
-            myIntent.putExtra("category_name",categoryName);
+            //myIntent.putExtra("category_name",categoryName);
             myIntent.putExtra("account_name",accountName);
             startActivity(myIntent);
         }else if(callingActivity.equals("com.example.blazej.languagelearner.LearningToPolishActivity")){
@@ -202,8 +330,10 @@ public class LearningSummaryActivity extends AppCompatActivity {
             myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
             myIntent.putStringArrayListExtra("learned_words",learnedWords);
             myIntent.putStringArrayListExtra("missed_words",missedWords);
+            myIntent.putStringArrayListExtra("learned_words_category",learnedWordsCategory);
+            myIntent.putStringArrayListExtra("missed_words_category",missedWordsCategory);
             myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
-            myIntent.putExtra("category_name",categoryName);
+            //myIntent.putExtra("category_name",categoryName);
             myIntent.putExtra("account_name",accountName);
             startActivity(myIntent);
         }else if(callingActivity.equals("com.example.blazej.languagelearner.ChoosingToPolishActivity")){
@@ -212,8 +342,10 @@ public class LearningSummaryActivity extends AppCompatActivity {
             myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
             myIntent.putStringArrayListExtra("learned_words",learnedWords);
             myIntent.putStringArrayListExtra("missed_words",missedWords);
+            myIntent.putStringArrayListExtra("learned_words_category",learnedWordsCategory);
+            myIntent.putStringArrayListExtra("missed_words_category",missedWordsCategory);
             myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
-            myIntent.putExtra("category_name",categoryName);
+            //myIntent.putExtra("category_name",categoryName);
             myIntent.putExtra("account_name",accountName);
             startActivity(myIntent);
         }else if(callingActivity.equals("com.example.blazej.languagelearner.ChoosingToGermanActivity")){
@@ -222,8 +354,10 @@ public class LearningSummaryActivity extends AppCompatActivity {
             myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
             myIntent.putStringArrayListExtra("learned_words",learnedWords);
             myIntent.putStringArrayListExtra("missed_words",missedWords);
+            myIntent.putStringArrayListExtra("learned_words_category",learnedWordsCategory);
+            myIntent.putStringArrayListExtra("missed_words_category",missedWordsCategory);
             myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
-            myIntent.putExtra("category_name",categoryName);
+            //myIntent.putExtra("category_name",categoryName);
             myIntent.putExtra("account_name",accountName);
             startActivity(myIntent);
         }else if(callingActivity.equals("com.example.blazej.languagelearner.ListenActivity")){

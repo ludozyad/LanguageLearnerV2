@@ -48,17 +48,17 @@ public class WordAccountStatusContract {
         return myIsLearnedDB.query
                 (DatabaseColumnsEntry.TABLE_NAME,
                         null,
-                        DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = ?",
-                        new String[]{accountName},
+                        DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = ?" + " AND " + DatabaseColumnsEntry.COLUMN_IS_LEARNED + " = ?",
+                        new String[]{accountName,"0"},
                         null,
                         null,
                         null);
     }
 
-    public static boolean ifWordAccountStatusCursorContain(String word,String categoryName,String accountName){
+    public static boolean ifWordAccountStatusCursorContain(String word,String categoryName,String accountName, Integer isLearned){
         Cursor cursor = getWordAccountStatusCursor();
             while(cursor.moveToNext()){
-                if(cursor.getString(1).equals(word)&&cursor.getString(2).equals(categoryName)&&cursor.getString(3).equals(accountName)){
+                if(cursor.getString(1).equals(word)&&cursor.getString(2).equals(categoryName)&&cursor.getString(3).equals(accountName)&&cursor.getInt(4)==isLearned){
                     cursor.close();
                     return true;
                 }

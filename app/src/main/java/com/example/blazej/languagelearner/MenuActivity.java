@@ -11,6 +11,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -29,7 +30,8 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
     /* A constant to save and restore the Cursor that is being displayed */
     private static final String TAG = "MenuActivity";
     private static final int LOADER_ID = 1;
-
+    private Button newContentBTN;
+    private Button reviewContentBTN;
 
     //private SQLiteDatabase myWordsDB;
     private ProgressBar spinner;
@@ -38,6 +40,10 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+        newContentBTN = (Button)findViewById(R.id.newContentBTN);
+        reviewContentBTN = (Button)findViewById(R.id.reviewContentBTN);
+        newContentBTN.setVisibility(View.INVISIBLE);
+        reviewContentBTN.setVisibility(View.INVISIBLE);
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
         spinner.setVisibility(View.GONE);
         WordsDbHelper wordsDbHelper = new WordsDbHelper(this);
@@ -87,6 +93,8 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(TAG,"onLoadFinished");
             spinner.setVisibility(View.GONE);
+            newContentBTN.setVisibility(View.VISIBLE);
+            reviewContentBTN.setVisibility(View.VISIBLE);
     }
 
     @Override

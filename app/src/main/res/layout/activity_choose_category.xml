@@ -29,26 +29,31 @@
 
         <NumberPicker
             android:id="@+id/numberPicker"
-            android:layout_width="100dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="10dp"
             android:layout_alignParentStart="true" />
 
         <Button
             android:id="@+id/startLearningActivityBTN"
-            android:onClick="startLearningActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/checkNumberBTN"
+            android:onClick="startLearningActivity"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="50dp"
-            android:layout_marginStart="50dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginStart="10dp"
             android:text="Start Learning" />
+
+        <Button
+            android:id="@+id/checkNumberBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/numberPicker"
+            android:onClick="onCheckNumberBTNClick"
+            android:text="@string/check_number" />
     </RelativeLayout>
 
 </LinearLayout>
