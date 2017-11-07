@@ -189,7 +189,7 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 missedWords.add(rightAnswer);
                 missedWordsCategory.add(categoriesOfWordsToReview.get(index));
-                yourAnswerTV.setTextColor(Color.RED);
+                yourAnswerTV.setTextColor(Color.WHITE);
             }
             rightAnswerTV.setVisibility(View.VISIBLE);
             yourAnswerTV.setVisibility(View.VISIBLE);
