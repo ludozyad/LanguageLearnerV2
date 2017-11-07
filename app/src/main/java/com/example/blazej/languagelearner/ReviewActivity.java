@@ -2,8 +2,11 @@ package com.example.blazej.languagelearner;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,11 +42,12 @@ public class ReviewActivity extends AppCompatActivity {
         WordsDbHelper wordsDbHelper = new WordsDbHelper(this);
         WordListContract.myWordsDB = wordsDbHelper.getWritableDatabase();
         numberPicker = (NumberPicker) findViewById(R.id.numberPicker2);
+        setDividerColor(numberPicker, Color.WHITE);
         sharedPref = getSharedPreferences(AccountListContract.sharedName,MODE_PRIVATE);
         accountName = sharedPref.getString(AccountListContract.sharedName,"XD");
         reviewCursor = WordAccountStatusContract.getWordAccountStatusCursorWithSpecificAccount(accountName);
 
-        if(reviewCursor.getCount() > 0) {
+        if(reviewCursor.getCount() > 3) {
             String[] wordsToReviewArray = new String[reviewCursor.getCount()];
             String[] categoriesOfWordsToReviewArray = new String[reviewCursor.getCount()];
 
@@ -86,7 +90,29 @@ public class ReviewActivity extends AppCompatActivity {
             numberPicker.setMinValue(4);
             numberPicker.setMaxValue(reviewCursor.getCount());
         }else{
-            Toast.makeText(this,"Nie ma słów do powtórki!",Toast.LENGTH_SHORT).show();
+            numberPicker.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void setDividerColor(NumberPicker picker, int color) {
+
+        java.lang.reflect.Field[] pickerFields = NumberPicker.class.getDeclaredFields();
+        for (java.lang.reflect.Field pf : pickerFields) {
+            if (pf.getName().equals("mSelectionDivider")) {
+                pf.setAccessible(true);
+                try {
+                    ColorDrawable colorDrawable = new ColorDrawable(color);
+                    pf.set(picker, colorDrawable);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (Resources.NotFoundException e) {
+                    e.printStackTrace();
+                }
+                catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
         }
     }
 

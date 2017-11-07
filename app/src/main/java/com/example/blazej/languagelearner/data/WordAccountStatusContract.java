@@ -32,12 +32,13 @@ public class WordAccountStatusContract {
     }
 
 
-    public static Cursor getLearnedPolishWords(String accountName){  //because we have only polish words in this base
+    public static Cursor getLearnedPolishWords(String accountName, String categoryName){  //because we have only polish words in this base
         return  WordAccountStatusContract.myIsLearnedDB.query(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME,
                 new String[] {WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME},
                 WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = ? " + "AND " +
+                        DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = ? " + "AND " +
                         WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED + " = ? ",
-                new String[] {accountName, "1"},
+                new String[] {accountName,categoryName, "1"},
                 null,
                 null,
                 null);

@@ -1,6 +1,5 @@
 package com.example.blazej.languagelearner;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -85,16 +84,22 @@ public class LearningToGermanActivity extends AppCompatActivity {
         questionCore(questionCount, currentQuestion);
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this,LoginActivity.class);
+        startActivity(intent);
+    }
+
     private void questionCore(int questionCount, int currentQuestion) {
         if(currentQuestion <= questionCount){
             whichQuestionTV.setText(currentQuestion + " of " + questionCount);
             int index = currentQuestion - 1;
             categoryName = categoriesOfWordsToReview.get(index);
-            selectedCategoryTV.setText("Selected Category: " + categoryName);
+            selectedCategoryTV.setText(getString(R.string.chosen_category,categoryName));
             polishWord = polishWordsInCategory.get(index);
             toLearnWordTV.setText(polishWord);
         }else{
-            Toast.makeText(this, "Koniec Pytań!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.end_of_questions, Toast.LENGTH_SHORT).show();
             showResult();
         }
     }
@@ -116,16 +121,16 @@ public class LearningToGermanActivity extends AppCompatActivity {
             int index = currentQuestion - 1;
             rightAnswer = germanWordsInCategory.get(index);
             if (yourAnswer.equals(rightAnswer)){
-                Toast.makeText(this, "Poprawna Odpowiedź!", Toast.LENGTH_SHORT).show();
-                yourAnswerTV.setText("Your Answer: " + yourAnswer);
-                rightAnswerTV.setText("Right Answer: " + rightAnswer);
+                Toast.makeText(this, R.string.congrats, Toast.LENGTH_SHORT).show();
+                yourAnswerTV.setText(getString(R.string.your_answer,yourAnswer));
+                rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 learnedWords.add(polishWord);
                 learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
                 yourAnswerTV.setTextColor(Color.GREEN);
             }else{
-                Toast.makeText(this, "Błędna Odpowiedź!", Toast.LENGTH_SHORT).show();
-                yourAnswerTV.setText("Your Answer: " + yourAnswer);
-                rightAnswerTV.setText("Right Answer: " + rightAnswer);
+                Toast.makeText(this, R.string.better_luck_next_time, Toast.LENGTH_SHORT).show();
+                yourAnswerTV.setText(getString(R.string.your_answer,yourAnswer));
+                rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 missedWords.add(polishWord);
                 missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                 yourAnswerTV.setTextColor(Color.RED);

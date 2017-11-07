@@ -23,7 +23,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void addToAccountList(View view) {
         if (mNewAccountNameEditText.getText().length() == 0) {
-            Toast.makeText(this,"Pole nie moze być puste",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,R.string.empty_field,Toast.LENGTH_SHORT).show();
             return;
         }
 

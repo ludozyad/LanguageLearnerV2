@@ -32,6 +32,8 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int LOADER_ID = 1;
     private Button newContentBTN;
     private Button reviewContentBTN;
+    private Button learnGrammarBTN;
+    private TextView pleaseWaitTV;
 
     //private SQLiteDatabase myWordsDB;
     private ProgressBar spinner;
@@ -42,15 +44,22 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_menu);
         newContentBTN = (Button)findViewById(R.id.newContentBTN);
         reviewContentBTN = (Button)findViewById(R.id.reviewContentBTN);
+        learnGrammarBTN = (Button)findViewById(R.id.learnGrammarBTN);
+        pleaseWaitTV = (TextView)findViewById(R.id.pleaseWaitTV);
         newContentBTN.setVisibility(View.INVISIBLE);
         reviewContentBTN.setVisibility(View.INVISIBLE);
+        learnGrammarBTN.setVisibility(View.INVISIBLE);
+        pleaseWaitTV.setVisibility(View.INVISIBLE);
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
         spinner.setVisibility(View.GONE);
         WordsDbHelper wordsDbHelper = new WordsDbHelper(this);
         WordListContract.myWordsDB = wordsDbHelper.getWritableDatabase();
-        WordAccountStatusDbHelper isLearnerDbHelper = new WordAccountStatusDbHelper(this);
-        WordAccountStatusContract.myIsLearnedDB = isLearnerDbHelper.getWritableDatabase();
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+    }
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this,LoginActivity.class);
+        startActivity(intent);
     }
 
 
@@ -62,7 +71,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
             protected void onStartLoading() {
 
                 spinner.setVisibility(View.VISIBLE);
-
+                pleaseWaitTV.setVisibility(View.VISIBLE);
                 if (WordListContract.getAllWordsTableCursor().getCount() != 0) {
                     Log.v(TAG,"getTableCursor().getCount()!=0 -- deliverResult");
                     deliverResult(WordListContract.getAllWordsTableCursor());
@@ -93,8 +102,10 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(TAG,"onLoadFinished");
             spinner.setVisibility(View.GONE);
+            pleaseWaitTV.setVisibility(View.INVISIBLE);
             newContentBTN.setVisibility(View.VISIBLE);
             reviewContentBTN.setVisibility(View.VISIBLE);
+            learnGrammarBTN.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -111,6 +122,11 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public void onReviewContent(View view) {
         Intent intent = new Intent(this, ReviewActivity.class);
+        startActivity(intent);
+    }
+
+    public void onGrammarLearn(View view) {
+        Intent intent = new Intent(this, ChooseGrammarCategoryActivity.class);
         startActivity(intent);
     }
 }

@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.example.blazej.languagelearner.data.AccountListContract;
 import com.example.blazej.languagelearner.data.AccountListDbHelper;
+import com.example.blazej.languagelearner.data.WordAccountStatusContract;
 import com.example.blazej.languagelearner.data.WordAccountStatusDbHelper;
 import com.example.blazej.languagelearner.data.WordListContract;
 
@@ -33,6 +34,8 @@ public class LoginActivity extends AppCompatActivity{
         registerButton = (Button)findViewById(R.id.add_account_button);
         accountRecycleView = (RecyclerView) this.findViewById(R.id.all_accounts_list_view);
         accountRecycleView.setLayoutManager(new LinearLayoutManager(this));
+        WordAccountStatusDbHelper isLearnerDbHelper = new WordAccountStatusDbHelper(this);
+        WordAccountStatusContract.myIsLearnedDB = isLearnerDbHelper.getWritableDatabase();
         AccountListDbHelper dbHelper = new AccountListDbHelper(this);
         AccountListContract.accountDB = dbHelper.getWritableDatabase();
         Cursor cursor = AccountListAdapter.getAllGuests();
@@ -57,7 +60,6 @@ public class LoginActivity extends AppCompatActivity{
             }
         });
     }
-
 
     public void startRegisterActivity(View view) {
         Intent intent = new Intent(this,RegisterActivity.class);

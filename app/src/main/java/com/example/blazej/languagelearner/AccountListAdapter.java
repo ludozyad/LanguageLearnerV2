@@ -2,6 +2,7 @@ package com.example.blazej.languagelearner;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.blazej.languagelearner.R;import com.example.blazej.languagelearner.data.AccountListContract;
+import com.example.blazej.languagelearner.data.WordAccountStatusContract;
 
 /**
  * Created by Blazej on 10.10.2017.
@@ -60,7 +62,7 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
         holder.itemView.setOnTouchListener((new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Toast.makeText(mContext, "Hold to delete", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, R.string.hold_to_delete, Toast.LENGTH_SHORT).show();
                 return false;
             }
         }));
@@ -94,6 +96,7 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
             nameTextView = (TextView)itemView.findViewById(R.id.name_text_view);
+            nameTextView.setTextColor(Color.WHITE);
         }
 
         @Override
@@ -105,7 +108,8 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
         public boolean onLongClick(View v) {
             clickListener.onItemLongClick(getAdapterPosition(), v);
             long id = (long) v.getTag();
-            removeGuest(id);
+            String name = "'" + nameTextView.getText().toString() + "'";
+            removeGuest(id,name);
             AccountListContract.mAdapter.swapCursor(getAllGuests());
             return false;
         }
@@ -115,8 +119,9 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
         AccountListAdapter.clickListener = clickListener;
     }
 
-    private boolean removeGuest(long id) {
-        return AccountListContract.accountDB.delete(AccountListContract.AccountListEntry.TABLE_NAME, AccountListContract.AccountListEntry._ID + "=" + id, null) > 0;
+    private void removeGuest(long id, String name) {
+         AccountListContract.accountDB.delete(AccountListContract.AccountListEntry.TABLE_NAME, AccountListContract.AccountListEntry._ID + "=" + id, null);
+         WordAccountStatusContract.myIsLearnedDB.delete(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME,WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + "=" + name, null);
     }
 
     public static Cursor getAllGuests() {

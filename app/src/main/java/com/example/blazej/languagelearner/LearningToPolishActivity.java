@@ -86,7 +86,7 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 myDB = myDBHelper.getWritableDatabase();
                 wordAccountStatusCursor = WordAccountStatusContract.getWordAccountStatusCursor();
                 //categoryName = intent.getStringExtra("category_name");
-                selectedCategoryTV.setText("Selected Category: " + categoryName);
+                selectedCategoryTV.setText(getString(R.string.chosen_category,categoryName));
                 questionCount = intent.getIntExtra("category_count",0);
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
@@ -139,12 +139,18 @@ public class LearningToPolishActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this,LoginActivity.class);
+        startActivity(intent);
+    }
+
     private void questionCore(int questionCount, int currentQuestion) {
         if(currentQuestion <= questionCount){
-            whichQuestionTV.setText(currentQuestion + " of " + questionCount);
+            whichQuestionTV.setText(currentQuestion + " z " + questionCount);
             int index = currentQuestion - 1;
             categoryName = categoriesOfWordsToReview.get(index);
-            selectedCategoryTV.setText("Selected Category: " + categoryName);
+            selectedCategoryTV.setText(getString(R.string.chosen_category,categoryName));
             germanWord = germanWordsInCategory.get(index);
             toLearnWordTV.setText(germanWord);
         }else{
@@ -170,16 +176,17 @@ public class LearningToPolishActivity extends AppCompatActivity {
             int index = currentQuestion - 1;
             rightAnswer = polishWordsInCategory.get(index);
             if (yourAnswer.equals(rightAnswer)){
-                Toast.makeText(this, "Poprawna Odpowiedź!", Toast.LENGTH_SHORT).show();
-                yourAnswerTV.setText("Your Answer: " + yourAnswer);
-                rightAnswerTV.setText("Right Answer: " + rightAnswer);
+                Toast.makeText(this,R.string.congrats, Toast.LENGTH_SHORT).show();
+                yourAnswerTV.setText(getString(R.string.your_answer,yourAnswer));
+                rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 learnedWords.add(rightAnswer);
                 learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
                 yourAnswerTV.setTextColor(Color.GREEN);
             }else{
-                Toast.makeText(this, "Błędna Odpowiedź!", Toast.LENGTH_SHORT).show();
-                yourAnswerTV.setText("Your Answer: " + yourAnswer);
-                rightAnswerTV.setText("Right Answer: " + rightAnswer);
+                Toast.makeText(this, R.string.better_luck_next_time, Toast.LENGTH_SHORT).show();
+                yourAnswerTV.setText(getString(R.string.your_answer,yourAnswer));
+
+                rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 missedWords.add(rightAnswer);
                 missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                 yourAnswerTV.setTextColor(Color.RED);
@@ -213,16 +220,4 @@ public class LearningToPolishActivity extends AppCompatActivity {
         Log.v("TAG", "Account Name: " + accountName+ " --- Selected Category: " + categoryName);
         startActivityForResult(myIntent,1);
     }
-
-
-    Cursor getWordsInCategory(String category){
-        return  myDB.query(WordListContract.DatabaseColumnsEntry.TABLE_NAME,
-                new String[] {WordListContract.DatabaseColumnsEntry.GERMAN_COLUMN_NAME,WordListContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME},
-                WordListContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = ?",
-                new String[]{category},
-                null,
-                null,
-                null);
-    }
-
 }

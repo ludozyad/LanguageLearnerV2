@@ -92,12 +92,18 @@ public class ChoosingToGermanActivity extends AppCompatActivity implements View.
         questionCore(questionCount,currentQuestion);
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this,LoginActivity.class);
+        startActivity(intent);
+    }
+
     private void questionCore(int questionCount, int currentQuestion) {
         if(currentQuestion <= questionCount){
-            whichQuestionTV.setText(currentQuestion + " of " + questionCount);
+            whichQuestionTV.setText(currentQuestion + " z " + questionCount);
             int index = currentQuestion - 1;
             categoryName = categoriesOfWordsToReview.get(index);
-            selectedCategoryTV.setText("Selected Category: " + categoryName);
+            selectedCategoryTV.setText(getString(R.string.chosen_category,categoryName));
             // To co mamy przetlumaczyć
             rightAnswer = germanWordsInCategory.get(index);
             // Dobra odpowiedz
@@ -179,15 +185,15 @@ public class ChoosingToGermanActivity extends AppCompatActivity implements View.
                 if(goodAnsIndex == 0){
                     learnedWords.add(polishWord);
                     learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
-                    yourAnswerTV.setText("Your answer: " + ans1BTN.getText());
+                    yourAnswerTV.setText(getString(R.string.your_answer,ans1BTN.getText()));
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
                     missedWords.add(polishWord);
                     missedWordsCategory.add(categoriesOfWordsToReview.get(index));
-                    yourAnswerTV.setText("Your answer: " + ans1BTN.getText());
+                    yourAnswerTV.setText(getString(R.string.your_answer,ans1BTN.getText()));
                     yourAnswerTV.setTextColor(Color.RED);
                 }
-                rightAnswerTV.setText("Right answer: " + rightAnswer);
+                rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 rightAnswerTV.setVisibility(View.VISIBLE);
                 yourAnswerTV.setVisibility(View.VISIBLE);
                 ans1BTN.setVisibility(View.INVISIBLE);
@@ -200,15 +206,15 @@ public class ChoosingToGermanActivity extends AppCompatActivity implements View.
                 if(goodAnsIndex == 1){
                     learnedWords.add(polishWord);
                     learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
-                    yourAnswerTV.setText("Your answer: " + ans2BTN.getText());
+                    yourAnswerTV.setText(getString(R.string.your_answer,ans2BTN.getText()));
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
                     missedWords.add(polishWord);
                     missedWordsCategory.add(categoriesOfWordsToReview.get(index));
-                    yourAnswerTV.setText("Your answer: " + ans2BTN.getText());
+                    yourAnswerTV.setText(getString(R.string.your_answer,ans2BTN.getText()));
                     yourAnswerTV.setTextColor(Color.RED);
                 }
-                rightAnswerTV.setText("Right answer: " + rightAnswer);
+                rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 rightAnswerTV.setVisibility(View.VISIBLE);
                 yourAnswerTV.setVisibility(View.VISIBLE);
                 ans1BTN.setVisibility(View.INVISIBLE);
@@ -221,15 +227,15 @@ public class ChoosingToGermanActivity extends AppCompatActivity implements View.
                 if(goodAnsIndex == 2){
                     learnedWords.add(polishWord);
                     learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
-                    yourAnswerTV.setText("Your answer: " + ans3BTN.getText());
+                    yourAnswerTV.setText(getString(R.string.your_answer, ans3BTN.getText()));
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
                     missedWords.add(polishWord);
                     missedWordsCategory.add(categoriesOfWordsToReview.get(index));
-                    yourAnswerTV.setText("Your answer: " + ans3BTN.getText());
+                    yourAnswerTV.setText(getString(R.string.your_answer,ans3BTN.getText()));
                     yourAnswerTV.setTextColor(Color.RED);
                 }
-                rightAnswerTV.setText("Right answer: " + rightAnswer);
+                rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 rightAnswerTV.setVisibility(View.VISIBLE);
                 yourAnswerTV.setVisibility(View.VISIBLE);
                 ans1BTN.setVisibility(View.INVISIBLE);
@@ -242,15 +248,15 @@ public class ChoosingToGermanActivity extends AppCompatActivity implements View.
                 if(goodAnsIndex == 3){
                     learnedWords.add(polishWord);
                     learnedWordsCategory.add(categoriesOfWordsToReview.get(index));
-                    yourAnswerTV.setText("Your answer: " + ans4BTN.getText());
+                    yourAnswerTV.setText(getString(R.string.your_answer,ans4BTN.getText()));
                     yourAnswerTV.setTextColor(Color.GREEN);
                 }else{
                     missedWords.add(polishWord);
                     missedWordsCategory.add(categoriesOfWordsToReview.get(index));
-                    yourAnswerTV.setText("Your answer: " + ans4BTN.getText());
+                    yourAnswerTV.setText(getString(R.string.your_answer,ans4BTN.getText()));
                     yourAnswerTV.setTextColor(Color.RED);
                 }
-                rightAnswerTV.setText("Right answer: " + rightAnswer);
+                rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 rightAnswerTV.setVisibility(View.VISIBLE);
                 yourAnswerTV.setVisibility(View.VISIBLE);
                 ans1BTN.setVisibility(View.INVISIBLE);
