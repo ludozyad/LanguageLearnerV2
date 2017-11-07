@@ -3,6 +3,7 @@ package com.example.blazej.languagelearner;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,15 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.blazej.languagelearner.data.WordAccountStatusContract;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -36,6 +46,11 @@ public class LearningSummaryActivity extends AppCompatActivity {
     ArrayList<String> reallyLearnedWords = new ArrayList<>();
     ArrayList<String> reallyLearnedCategories = new ArrayList<>();
     ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
+    ArrayList<Entry> yvalues = new ArrayList<>();
+    PieDataSet dataSet;
+    Legend legend = new Legend();
+    PieData data = new PieData();
+    ArrayList<String> xVals = new ArrayList<>();
     TextView ansPercent;
     //Cursor cursor;
     String categoryName;
@@ -47,11 +62,14 @@ public class LearningSummaryActivity extends AppCompatActivity {
     float allAnswers;
     float goodAnsPercent;
     DecimalFormat df;
+    PieChart pieChart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learning_summary);
+        pieChart = (PieChart) findViewById(R.id.pieChart);
+        pieChart.setUsePercentValues(true);
         ansPercent = (TextView)findViewById(R.id.goodAnsPercentTV);
         callingActivity = getCallingActivity().getClassName();
         Log.v("TAG", "Calling activity: " + callingActivity);
@@ -91,6 +109,49 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 Log.v("TAG","goodAnsPercent: " + goodAnsPercent);
                 ansPercent.setText(getString(R.string.good_ans,df.format(goodAnsPercent)));
                 ansPercent.setVisibility(View.VISIBLE);
+
+                /*
+                PieDataSet dataSetLA = new PieDataSet(yvalues, "Wyniki Nauki");
+                Legend legendLA = new Legend();
+                PieData dataLA = new PieData();
+                ArrayList<String> xValsLA = new ArrayList<>();
+                ArrayList<Entry> yvaluesLA = new ArrayList<>();
+
+                yvaluesLA.add(new Entry(badAnswers, 0));
+                yvaluesLA.add(new Entry(goodAnswers, 1));
+                Log.v("TAG","yvalues: " + yvalues.size());
+                xValsLA.add("Błędne Odpowiedzi");
+                xValsLA.add("Poprawne Odpowiedzi");
+                legendLA.setEnabled(false);
+                dataLA.setValueFormatter(new PercentFormatter());
+                dataLA.setValueTextSize(22f);
+                dataLA.setValueTextColor(Color.DKGRAY);
+                dataLA = new PieData(xValsLA, dataSetLA);
+                pieChart.setData(dataLA);
+                dataSetLA.setColors(ColorTemplate.JOYFUL_COLORS);
+                pieChart.setDrawHoleEnabled(false);
+                pieChart.setScaleX(0.6f);
+                pieChart.setScaleY(0.6f);
+                pieChart.setDescription("");
+                */
+                yvalues.add(new Entry(badAnswers, 0));
+                yvalues.add(new Entry(goodAnswers, 1));
+                dataSet = new PieDataSet(yvalues, "Wyniki Nauki");
+                Log.v("TAG","yvalues: " + yvalues.size());
+                xVals.add("Błędne Odpowiedzi");
+                xVals.add("Poprawne Odpowiedzi");
+                legend = pieChart.getLegend();
+                legend.setEnabled(false);
+                data = new PieData(xVals, dataSet);
+                data.setValueFormatter(new PercentFormatter());
+                data.setValueTextSize(22f);
+                data.setValueTextColor(Color.DKGRAY);
+                pieChart.setData(data);
+                dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+                pieChart.setDrawHoleEnabled(false);
+                pieChart.setScaleX(0.6f);
+                pieChart.setScaleY(0.6f);
+                pieChart.setDescription("");
 
                 for(int i=0; i<missedWords.size();i++){
                     Log.v("TAG", "missedWords: " + missedWords.get(i));
@@ -148,6 +209,25 @@ public class LearningSummaryActivity extends AppCompatActivity {
 
                 ansPercent.setText(getString(R.string.good_ans,df.format(goodAnsPercent)));
                 ansPercent.setVisibility(View.VISIBLE);
+
+                yvalues.add(new Entry(badAnswers, 0));
+                yvalues.add(new Entry(goodAnswers, 1));
+                dataSet = new PieDataSet(yvalues, "Wyniki Nauki");
+                Log.v("TAG","yvalues: " + yvalues.size());
+                xVals.add("Błędne Odpowiedzi");
+                xVals.add("Poprawne Odpowiedzi");
+                legend = pieChart.getLegend();
+                legend.setEnabled(false);
+                data = new PieData(xVals, dataSet);
+                data.setValueFormatter(new PercentFormatter());
+                data.setValueTextSize(22f);
+                data.setValueTextColor(Color.DKGRAY);
+                pieChart.setData(data);
+                dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+                pieChart.setDrawHoleEnabled(false);
+                pieChart.setScaleX(0.6f);
+                pieChart.setScaleY(0.6f);
+                pieChart.setDescription("");
                 break;
         }
     }

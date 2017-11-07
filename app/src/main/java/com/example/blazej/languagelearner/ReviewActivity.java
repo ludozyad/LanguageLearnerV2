@@ -42,6 +42,7 @@ public class ReviewActivity extends AppCompatActivity {
         WordsDbHelper wordsDbHelper = new WordsDbHelper(this);
         WordListContract.myWordsDB = wordsDbHelper.getWritableDatabase();
         numberPicker = (NumberPicker) findViewById(R.id.numberPicker2);
+        numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
         setDividerColor(numberPicker, Color.WHITE);
         sharedPref = getSharedPreferences(AccountListContract.sharedName,MODE_PRIVATE);
         accountName = sharedPref.getString(AccountListContract.sharedName,"XD");

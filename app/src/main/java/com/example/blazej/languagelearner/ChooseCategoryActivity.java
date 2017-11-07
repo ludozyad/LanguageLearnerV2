@@ -61,6 +61,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
         accountName = sharedPref.getString(AccountListContract.sharedName,"XD");
         categoriesListView = (ListView) findViewById(R.id.categoriesListView);
         numberPicker = (NumberPicker) findViewById(R.id.numberPicker);
+        numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
         setDividerColor(numberPicker, Color.WHITE);
         categoryCountBTN = (Button)findViewById(R.id.startLearningActivityBTN);
         categoryCountBTN.setVisibility(View.INVISIBLE);

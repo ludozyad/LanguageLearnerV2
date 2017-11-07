@@ -190,7 +190,7 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
                     missedWords.add(rightAnswer);
                     missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText(getString(R.string.your_answer,ans1BTN.getText()));
-                    yourAnswerTV.setTextColor(Color.RED);
+                    yourAnswerTV.setTextColor(Color.WHITE);
                 }
                 rightAnswerTV.setText(getString(R.string.your_answer,rightAnswer));
                 rightAnswerTV.setVisibility(View.VISIBLE);
@@ -211,7 +211,7 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
                     missedWords.add(rightAnswer);
                     missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText(getString(R.string.chosen_category,ans2BTN.getText()));
-                    yourAnswerTV.setTextColor(Color.RED);
+                    yourAnswerTV.setTextColor(Color.WHITE);
                 }
                 rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 rightAnswerTV.setVisibility(View.VISIBLE);
@@ -232,7 +232,7 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
                     missedWords.add(rightAnswer);
                     missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText(getString(R.string.your_answer,ans3BTN.getText()));
-                    yourAnswerTV.setTextColor(Color.RED);
+                    yourAnswerTV.setTextColor(Color.WHITE);
                 }
                 rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 rightAnswerTV.setVisibility(View.VISIBLE);
@@ -253,7 +253,7 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
                     missedWords.add(rightAnswer);
                     missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                     yourAnswerTV.setText(getString(R.string.your_answer,ans4BTN.getText()));
-                    yourAnswerTV.setTextColor(Color.RED);
+                    yourAnswerTV.setTextColor(Color.WHITE);
                 }
                 rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 rightAnswerTV.setVisibility(View.VISIBLE);

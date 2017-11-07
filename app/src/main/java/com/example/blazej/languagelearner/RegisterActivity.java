@@ -1,7 +1,9 @@
 package com.example.blazej.languagelearner;
 
+import android.accounts.Account;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -26,11 +28,17 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(this,R.string.empty_field,Toast.LENGTH_SHORT).show();
             return;
         }
-
+        Cursor accListCursor = AccountListContract.getAccountCursor();
+        while(accListCursor.moveToNext()){
+            if(accListCursor.getString(1).equals(mNewAccountNameEditText.getText().toString())){
+                Toast.makeText(this, R.string.double_user,Toast.LENGTH_SHORT).show();
+                mNewAccountNameEditText.getText().clear();
+                return;
+            }
+        }
         // Add guest info to mDb
         addNewAccount(mNewAccountNameEditText.getText().toString());
         AccountListContract.mAdapter.swapCursor(AccountListAdapter.getAllGuests());
-
     }
 
     private long addNewAccount(String name) {
