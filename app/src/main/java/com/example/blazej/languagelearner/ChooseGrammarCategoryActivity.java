@@ -2,7 +2,9 @@ package com.example.blazej.languagelearner;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,12 +35,15 @@ public class ChooseGrammarCategoryActivity extends AppCompatActivity {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
                 android.R.layout.simple_list_item_1, categoriesArrayList) {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @NonNull
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
                 TextView text = (TextView) view.findViewById(android.R.id.text1);
-                text.setTextColor(Color.WHITE);
+                text.setTextAppearance(R.style.learning_font);
+                text.setTextColor(Color.rgb(27,100,255));
+                text.setTextSize(19);
                 return view;
             }
         };

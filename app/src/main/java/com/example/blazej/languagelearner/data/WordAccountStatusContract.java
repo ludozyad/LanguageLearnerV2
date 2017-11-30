@@ -17,6 +17,8 @@ public class WordAccountStatusContract {
         public static final String POLISH_COLUMN_NAME = "polish_column";
         public static final String COLUMN_ACCOUNT_NAME = "name_column";
         public static final String COLUMN_IS_LEARNED = "is_learned_column";
+        public static final String COLUMN_IS_LEARNED_COUNTER = "is_learned_counter_column";
+        public static final String COLUMN_REVIEW_DATE = "review_date_column";
         public static final String CATEGORY_COLUMN_NAME = "title_column";
     }
 
@@ -44,13 +46,26 @@ public class WordAccountStatusContract {
                 null);
     }
 
-
+    // do zmiany
     public static Cursor getWordAccountStatusCursorWithSpecificAccount(String accountName){
         return myIsLearnedDB.query
                 (DatabaseColumnsEntry.TABLE_NAME,
                         null,
+                        //DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = ?" + " AND " + DatabaseColumnsEntry.COLUMN_IS_LEARNED + " = ?",
+                        //new String[]{accountName,"0"},
+                        DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = ?",
+                        new String[]{accountName},
+                        null,
+                        null,
+                        null);
+    }
+
+    public static Cursor getWordAccountStatusCursorWithSpecificAccountLearned(String accountName){
+        return myIsLearnedDB.query
+                (DatabaseColumnsEntry.TABLE_NAME,
+                        null,
                         DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = ?" + " AND " + DatabaseColumnsEntry.COLUMN_IS_LEARNED + " = ?",
-                        new String[]{accountName,"0"},
+                        new String[]{accountName,"1"},
                         null,
                         null,
                         null);

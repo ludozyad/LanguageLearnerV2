@@ -27,7 +27,9 @@ public class WordAccountStatusDbHelper extends SQLiteOpenHelper {
                 WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME + " TEXT NOT NULL, " +
                 WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " TEXT NOT NULL, " +
                 WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " TEXT NOT NULL, " +
-                WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED + " BOOLEAN NOT NULL " +
+                WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED + " BOOLEAN NOT NULL, " +
+                WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED_COUNTER + " INTEGER NOT NULL, " +
+                WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_REVIEW_DATE + " DATE NOT NULL " +
                 "); ";
         db.execSQL(SQL_CREATE_TABLE);
     }

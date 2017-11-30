@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.blazej.languagelearner.data.AccountListContract;
 import com.example.blazej.languagelearner.data.WordAccountStatusContract;
@@ -33,6 +34,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
     private Button newContentBTN;
     private Button reviewContentBTN;
     private Button learnGrammarBTN;
+    private Button retryBTN;
     private TextView pleaseWaitTV;
 
     //private SQLiteDatabase myWordsDB;
@@ -45,16 +47,27 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
         newContentBTN = (Button)findViewById(R.id.newContentBTN);
         reviewContentBTN = (Button)findViewById(R.id.reviewContentBTN);
         learnGrammarBTN = (Button)findViewById(R.id.learnGrammarBTN);
+        retryBTN = (Button)findViewById(R.id.retryBTN);
         pleaseWaitTV = (TextView)findViewById(R.id.pleaseWaitTV);
         newContentBTN.setVisibility(View.INVISIBLE);
         reviewContentBTN.setVisibility(View.INVISIBLE);
         learnGrammarBTN.setVisibility(View.INVISIBLE);
+        retryBTN.setVisibility(View.INVISIBLE);
         pleaseWaitTV.setVisibility(View.INVISIBLE);
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
         spinner.setVisibility(View.GONE);
         WordsDbHelper wordsDbHelper = new WordsDbHelper(this);
         WordListContract.myWordsDB = wordsDbHelper.getWritableDatabase();
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+
+        retryBTN.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+               onClickRestart();
+            }
+        });
+    }
+    public void onClickRestart(){
+        getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
     }
     @Override
     public void onBackPressed() {
@@ -69,9 +82,9 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
 
             @Override
             protected void onStartLoading() {
-
                 spinner.setVisibility(View.VISIBLE);
                 pleaseWaitTV.setVisibility(View.VISIBLE);
+                retryBTN.setVisibility(View.INVISIBLE);
                 if (WordListContract.getAllWordsTableCursor().getCount() != 0) {
                     Log.v(TAG,"getTableCursor().getCount()!=0 -- deliverResult");
                     deliverResult(WordListContract.getAllWordsTableCursor());
@@ -86,8 +99,14 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
                 Log.v(TAG,"loadInBackground()");
                 WordListContract.headingList = DownloadTask.downloadHeadingName(WordListContract.wordListUrl, WordListContract.categoriesHtmlPlace);
                 ArrayList<LinkedHashMap<String, String>> wordList = DownloadTask.downloadAllWords(WordListContract.wordListUrl, WordListContract.categoriesHtmlPlace, WordListContract.baseSiteUll, WordListContract.wordsTables);
-                WordsDbHelper.fillMyBase(WordListContract.headingList, wordList, WordListContract.myWordsDB);
-                return WordListContract.getAllWordsTableCursor();
+                if(WordListContract.headingList!=null && wordList!=null) {
+                    WordsDbHelper.fillMyBase(WordListContract.headingList, wordList, WordListContract.myWordsDB);
+                    return WordListContract.getAllWordsTableCursor();
+                }else{
+                    Log.v("TAG","Internet Error!");
+                    Log.v("TAG", "WordListContract.getAllWordsTableCursor().size: " + WordListContract.getAllWordsTableCursor().getCount());
+                    return WordListContract.getAllWordsTableCursor();
+                }
             }
 
             @Override
@@ -101,19 +120,23 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(TAG,"onLoadFinished");
-            spinner.setVisibility(View.GONE);
-            pleaseWaitTV.setVisibility(View.INVISIBLE);
+        spinner.setVisibility(View.GONE);
+        pleaseWaitTV.setVisibility(View.INVISIBLE);
+        if(data.getCount() > 0) {
             newContentBTN.setVisibility(View.VISIBLE);
             reviewContentBTN.setVisibility(View.VISIBLE);
             learnGrammarBTN.setVisibility(View.VISIBLE);
+            retryBTN.setVisibility(View.INVISIBLE);
+        }else{
+            Toast.makeText(this,"Brak połączenia z internetem",Toast.LENGTH_SHORT).show();
+            retryBTN.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.v(TAG,"OnLoaderReset");
     }
-
-
 
     public void onChooseCategoryClick(View view) {
         Intent intent = new Intent(this,ChooseCategoryActivity.class);

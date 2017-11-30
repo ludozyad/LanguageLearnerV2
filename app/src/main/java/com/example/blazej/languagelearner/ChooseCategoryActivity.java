@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -40,13 +41,14 @@ public class ChooseCategoryActivity extends AppCompatActivity {
     ArrayList<String> germanWordsToLearnArray;
     ArrayList<String> polishWordsToLearnArray;
     ArrayList<String> categoriesOfWordsArrayList = new ArrayList<>();
-    TextView myTextView;
+    TextView categoryCountTV;
     ListView categoriesListView;
     NumberPicker numberPicker;
     TextView chooseCategoryTV;
     String categoryName;
     int selectedCategoryCount;
     Button categoryCountBTN;
+    EditText pickNumberET;
     String accountName;
     SharedPreferences sharedPref;
 
@@ -54,7 +56,10 @@ public class ChooseCategoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_category);
+        pickNumberET = (EditText)findViewById(R.id.pickNumberET);
+        pickNumberET.setVisibility(View.INVISIBLE);
         chooseCategoryTV = (TextView)findViewById(R.id.chooseCategoryTV);
+        categoryCountTV = (TextView)findViewById(R.id.categoryCountTV);
         categoryName = "";
         chooseCategoryTV.setText(getString(R.string.chosen_category,categoryName));
         sharedPref = getSharedPreferences(AccountListContract.sharedName,MODE_PRIVATE);
@@ -62,6 +67,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
         categoriesListView = (ListView) findViewById(R.id.categoriesListView);
         numberPicker = (NumberPicker) findViewById(R.id.numberPicker);
         numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+        numberPicker.setWrapSelectorWheel(true);
         setDividerColor(numberPicker, Color.WHITE);
         categoryCountBTN = (Button)findViewById(R.id.startLearningActivityBTN);
         categoryCountBTN.setVisibility(View.INVISIBLE);
@@ -104,14 +110,30 @@ public class ChooseCategoryActivity extends AppCompatActivity {
                 Log.v("TAG", "polishWordsToLearnArray size: " + polishWordsToLearnArray.size());
 
                 if(germanWordsToLearnArray.size() > 3) {
-                    numberPicker.setMinValue(4);
-                    numberPicker.setMaxValue(germanWordsToLearnArray.size());
+                    categoryCountBTN.setVisibility(View.VISIBLE);
+                    chooseCategoryTV.setVisibility(View.VISIBLE);
+                    categoryCountTV.setVisibility(View.VISIBLE);
+                    Log.v("TAG", "germanWordsToLearnArray.size() > 3");
+                    if(germanWordsToLearnArray.size()<7){
+                        Toast.makeText(getApplicationContext(),"Wprowadź cyfre z zakresu 4 do " + germanWordsToLearnArray.size(),Toast.LENGTH_SHORT).show();
+                        pickNumberET.setText("");
+                        pickNumberET.setVisibility(View.VISIBLE);
+                        numberPicker.setVisibility(View.INVISIBLE);
+                    }else{
+                        pickNumberET.setVisibility(View.INVISIBLE);
+                        numberPicker.setVisibility(View.VISIBLE);
+                        numberPicker.setMinValue(4);
+                        numberPicker.setMaxValue(germanWordsToLearnArray.size());
+                    }
                 }else {
-                    numberPicker.setMinValue(0);
-                    numberPicker.setMaxValue(0);
-                    numberPicker.setValue(0);
+                    Toast.makeText(getApplicationContext(), "Za mało słów do nauki, wybierz inną kategorię.", Toast.LENGTH_SHORT).show();
+                    numberPicker.setVisibility(View.INVISIBLE);
+                    categoryCountBTN.setVisibility(View.INVISIBLE);
+                    categoryCountTV.setVisibility(View.INVISIBLE);
+                    //numberPicker.setMinValue(0);
+                    //numberPicker.setMaxValue(0);
+                    //numberPicker.setValue(0);
                 }
-                categoryCountBTN.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -203,10 +225,16 @@ public class ChooseCategoryActivity extends AppCompatActivity {
     }
 
     public void startLearningActivity(View view) {
-        selectedCategoryCount = numberPicker.getValue();
+        if(germanWordsToLearnArray.size()> 0 && germanWordsToLearnArray.size() < 7){
+            selectedCategoryCount = Integer.parseInt(pickNumberET.getText().toString());
+        }else if (germanWordsToLearnArray.size() >= 7){
+            selectedCategoryCount = numberPicker.getValue();
+        }else{
+            selectedCategoryCount=0;
+        }
         if (selectedCategoryCount < 4) {
             Toast.makeText(this, "Za mało słów do nauki, wybierz inną kategorię.", Toast.LENGTH_SHORT).show();
-        } else {
+        } else if(selectedCategoryCount > 3 && selectedCategoryCount <= germanWordsToLearnArray.size()){
             Intent myIntent = new Intent(getApplicationContext(), LearningToPolishActivity.class);
             myIntent.putExtra("category_name", categoryName);
             myIntent.putExtra("category_count", selectedCategoryCount);
@@ -215,6 +243,9 @@ public class ChooseCategoryActivity extends AppCompatActivity {
             myIntent.putStringArrayListExtra("word_category", categoriesOfWordsArrayList);
             Log.v("TAG", "germanWordsToLearnArray: " + germanWordsToLearnArray.size() + " polishWordsToLearnArray: " + polishWordsToLearnArray.size() + " categoriesOfWordsArrayList.size(): " + categoriesOfWordsArrayList.size());
             startActivityForResult(myIntent, 1);
+        } else if(selectedCategoryCount > germanWordsToLearnArray.size()){
+            Toast.makeText(this,"Wprowadź cyfre z zakresu 4 do " + germanWordsToLearnArray.size(),Toast.LENGTH_SHORT).show();
+            pickNumberET.setText("");
         }
     }
 }

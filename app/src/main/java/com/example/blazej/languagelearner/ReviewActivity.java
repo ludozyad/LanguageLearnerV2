@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
@@ -19,7 +20,13 @@ import com.example.blazej.languagelearner.data.WordAccountStatusContract;
 import com.example.blazej.languagelearner.data.WordListContract;
 import com.example.blazej.languagelearner.data.WordsDbHelper;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 
 public class ReviewActivity extends AppCompatActivity {
@@ -32,7 +39,12 @@ public class ReviewActivity extends AppCompatActivity {
     ArrayList<String> germanWordsByAccount = new ArrayList<>();
     ArrayList<String> polishWordsByAccount = new ArrayList<>();
     ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
+    Button startReviewBTN;
     ArrayList<String> categoriesOfWords = new ArrayList<>();
+    DateFormat dateFormat;
+    String localTime;
+    Date currentLocalTime;
+    Calendar cal;
     int wordsToReviewCount = 0;
 
     @Override
@@ -46,16 +58,40 @@ public class ReviewActivity extends AppCompatActivity {
         setDividerColor(numberPicker, Color.WHITE);
         sharedPref = getSharedPreferences(AccountListContract.sharedName,MODE_PRIVATE);
         accountName = sharedPref.getString(AccountListContract.sharedName,"XD");
+        cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"));
+        currentLocalTime = cal.getTime();
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
+        localTime = dateFormat.format(currentLocalTime);
+        startReviewBTN = (Button)findViewById(R.id.startReviewBTN);
         reviewCursor = WordAccountStatusContract.getWordAccountStatusCursorWithSpecificAccount(accountName);
 
+        if(reviewCursor == null) {
+            Log.v("TAG", "reviewCursor jest nullem");
+        }else{
+            Log.v("TAG", "reviewCursor count: " + reviewCursor.getCount());
+        }
         if(reviewCursor.getCount() > 3) {
             String[] wordsToReviewArray = new String[reviewCursor.getCount()];
             String[] categoriesOfWordsToReviewArray = new String[reviewCursor.getCount()];
 
             if (reviewCursor.getCount() > 0) {
                 while (reviewCursor.moveToNext()) {
-                    wordsToReview.add(reviewCursor.getString(1));
-                    categoriesOfWordsToReview.add(reviewCursor.getString(2));
+                    Date date = new Date();
+                    try {
+                        date = dateFormat.parse(reviewCursor.getString(6));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    if(date.equals(currentLocalTime) || date.before(currentLocalTime)) {
+                        Log.v("TAG","Slowo: " + reviewCursor.getString(1));
+                        Log.v("TAG","Data powtorki: " + reviewCursor.getString(6));
+                        Log.v("TAG","Dzisiejsza Data: " + localTime);
+                        wordsToReview.add(reviewCursor.getString(1));
+                        categoriesOfWordsToReview.add(reviewCursor.getString(2));
+                    }else{
+                        Log.v("TAG", "Nie ma slow do powrotki!! (daty niezgodne)");
+                    }
                 }
 
                 wordsToReviewArray = wordsToReview.toArray(new String[wordsToReview.size()]);
@@ -69,29 +105,42 @@ public class ReviewActivity extends AppCompatActivity {
                 Log.v("TAG", "categoriesOfWordsToReview: " + categoriesOfWordsToReview.get(i));
             }
 
-            Cursor wordsToReview = WordListContract.getAllWordsByArray(wordsToReviewArray, categoriesOfWordsToReviewArray);
+            Cursor wordsToReviewCursor = WordListContract.getAllWordsByArray(wordsToReviewArray, categoriesOfWordsToReviewArray);
 
 
             categoriesOfWords = new ArrayList<>();
-            if (wordsToReview.getCount() > 0) {
-                while (wordsToReview.moveToNext()) {
-                    Log.v("TAG", "0: " + wordsToReview.getString(0));
-                    Log.v("TAG", "1: " + wordsToReview.getString(1));
-                    Log.v("TAG", "2: " + wordsToReview.getString(2));
-                    Log.v("TAG", "3: " + wordsToReview.getString(3));
-                    Log.v("TAG", "4: " + wordsToReview.getString(4));
-                    germanWordsByAccount.add(wordsToReview.getString(1));
-                    polishWordsByAccount.add(wordsToReview.getString(2));
-                    categoriesOfWords.add(wordsToReview.getString(3));
+            if(wordsToReviewCursor!=null) {
+                if (wordsToReviewCursor.getCount() > 0) {
+                    while (wordsToReviewCursor.moveToNext()) {
+                        Log.v("TAG", "0: " + wordsToReviewCursor.getString(0));
+                        Log.v("TAG", "1: " + wordsToReviewCursor.getString(1));
+                        Log.v("TAG", "2: " + wordsToReviewCursor.getString(2));
+                        Log.v("TAG", "3: " + wordsToReviewCursor.getString(3));
+                        Log.v("TAG", "4: " + wordsToReviewCursor.getString(4));
+                        germanWordsByAccount.add(wordsToReviewCursor.getString(1));
+                        polishWordsByAccount.add(wordsToReviewCursor.getString(2));
+                        categoriesOfWords.add(wordsToReviewCursor.getString(3));
+                        wordsToReviewCursor.close();
+                    }
+                } else {
+                    Log.v("TAG", "Nie ma słów do powtórki!");
+                    numberPicker.setVisibility(View.INVISIBLE);
+                    startReviewBTN.setVisibility(View.INVISIBLE);
+                    Toast.makeText(this,"Niewystarczająca ilość słów do powtórki!",Toast.LENGTH_SHORT).show();
                 }
-            } else {
+            }else{
                 Log.v("TAG", "Nie ma słów do powtórki!");
+                numberPicker.setVisibility(View.INVISIBLE);
+                startReviewBTN.setVisibility(View.INVISIBLE);
+                Toast.makeText(this,"Niewystarczająca ilość słów do powtórki!",Toast.LENGTH_SHORT).show();
             }
-            wordsToReview.close();
+            //
             numberPicker.setMinValue(4);
-            numberPicker.setMaxValue(reviewCursor.getCount());
+            numberPicker.setMaxValue(wordsToReview.size());
         }else{
             numberPicker.setVisibility(View.INVISIBLE);
+            startReviewBTN.setVisibility(View.INVISIBLE);
+            Toast.makeText(this,"Niewystarczająca ilość słów do powtórki!",Toast.LENGTH_SHORT).show();
         }
     }
 
