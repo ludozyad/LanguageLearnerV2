@@ -1,8 +1,10 @@
 package com.example.blazej.languagelearner;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -105,12 +107,21 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
         }
 
         @Override
-        public boolean onLongClick(View v) {
+        public boolean onLongClick(final View v) {
             clickListener.onItemLongClick(getAdapterPosition(), v);
-            long id = (long) v.getTag();
-            String name = "'" + nameTextView.getText().toString() + "'";
-            removeGuest(id,name);
-            AccountListContract.mAdapter.swapCursor(getAllGuests());
+
+            new AlertDialog.Builder(mContext)
+                    .setTitle("Czy chcesz usunąć konto " + nameTextView.getText().toString() + " ?")
+                    .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            long myId = (long) v.getTag();
+                            String name = "'" + nameTextView.getText().toString() + "'";
+                            removeGuest(myId,name);
+                            AccountListContract.mAdapter.swapCursor(getAllGuests());
+                        }
+                    })
+                    .setNegativeButton("Nie", null)
+                    .show();
             return false;
         }
     }

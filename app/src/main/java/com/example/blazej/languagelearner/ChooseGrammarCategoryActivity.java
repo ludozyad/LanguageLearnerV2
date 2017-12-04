@@ -42,7 +42,7 @@ public class ChooseGrammarCategoryActivity extends AppCompatActivity {
                 View view = super.getView(position, convertView, parent);
                 TextView text = (TextView) view.findViewById(android.R.id.text1);
                 text.setTextAppearance(R.style.learning_font);
-                text.setTextColor(Color.rgb(27,100,255));
+                text.setTextColor(Color.rgb(0,173,220));
                 text.setTextSize(19);
                 return view;
             }

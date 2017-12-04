@@ -71,11 +71,10 @@ public class ReviewActivity extends AppCompatActivity {
         }else{
             Log.v("TAG", "reviewCursor count: " + reviewCursor.getCount());
         }
-        if(reviewCursor.getCount() > 3) {
-            String[] wordsToReviewArray = new String[reviewCursor.getCount()];
-            String[] categoriesOfWordsToReviewArray = new String[reviewCursor.getCount()];
+        if(reviewCursor.getCount() > 0) {
+            String[] wordsToReviewArray;
+            String[] categoriesOfWordsToReviewArray;
 
-            if (reviewCursor.getCount() > 0) {
                 while (reviewCursor.moveToNext()) {
                     Date date = new Date();
                     try {
@@ -83,7 +82,8 @@ public class ReviewActivity extends AppCompatActivity {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    if(date.equals(currentLocalTime) || date.before(currentLocalTime)) {
+                    if(date.before(currentLocalTime) || date.equals(currentLocalTime)){
+                           // date.equals(currentLocalTime) || date.before(currentLocalTime)) {
                         Log.v("TAG","Slowo: " + reviewCursor.getString(1));
                         Log.v("TAG","Data powtorki: " + reviewCursor.getString(6));
                         Log.v("TAG","Dzisiejsza Data: " + localTime);
@@ -97,9 +97,9 @@ public class ReviewActivity extends AppCompatActivity {
                 wordsToReviewArray = wordsToReview.toArray(new String[wordsToReview.size()]);
                 categoriesOfWordsToReviewArray = categoriesOfWordsToReview.toArray(new String[categoriesOfWordsToReview.size()]);
 
-            } else {
-                Log.v("TAG", "reviewCursor pusty!!");
-            }
+       //     } else {
+       //         Log.v("TAG", "reviewCursor pusty!!");
+       //     }
 
             for (int i = 0; i < categoriesOfWordsToReview.size(); i++) {
                 Log.v("TAG", "categoriesOfWordsToReview: " + categoriesOfWordsToReview.get(i));
@@ -120,7 +120,6 @@ public class ReviewActivity extends AppCompatActivity {
                         germanWordsByAccount.add(wordsToReviewCursor.getString(1));
                         polishWordsByAccount.add(wordsToReviewCursor.getString(2));
                         categoriesOfWords.add(wordsToReviewCursor.getString(3));
-                        wordsToReviewCursor.close();
                     }
                 } else {
                     Log.v("TAG", "Nie ma słów do powtórki!");
@@ -135,7 +134,7 @@ public class ReviewActivity extends AppCompatActivity {
                 Toast.makeText(this,"Niewystarczająca ilość słów do powtórki!",Toast.LENGTH_SHORT).show();
             }
             //
-            numberPicker.setMinValue(4);
+            numberPicker.setMinValue(1);
             numberPicker.setMaxValue(wordsToReview.size());
         }else{
             numberPicker.setVisibility(View.INVISIBLE);
@@ -153,12 +152,7 @@ public class ReviewActivity extends AppCompatActivity {
                 try {
                     ColorDrawable colorDrawable = new ColorDrawable(color);
                     pf.set(picker, colorDrawable);
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                } catch (Resources.NotFoundException e) {
-                    e.printStackTrace();
-                }
-                catch (IllegalAccessException e) {
+                } catch (IllegalArgumentException | Resources.NotFoundException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
                 break;
@@ -169,7 +163,7 @@ public class ReviewActivity extends AppCompatActivity {
     public void onStartReview(View view) {
         wordsToReviewCount = numberPicker.getValue();
         Intent myIntent = new Intent(getApplicationContext(), LearningToPolishActivity.class);
-        if(reviewCursor.getCount() > 3){
+        if(reviewCursor.getCount() > 0){
             for(int i = 0 ; i < categoriesOfWordsToReview.size(); i++){
                 Log.v("TAG","categoriesOfWordsToReview: " + categoriesOfWordsToReview.get(i));
             }

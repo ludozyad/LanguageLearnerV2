@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.blazej.languagelearner.data.WordAccountStatusContract;
@@ -53,13 +54,7 @@ public class LearningSummaryActivity extends AppCompatActivity {
     ArrayList<String> reallyLearnedWords = new ArrayList<>();
     ArrayList<String> reallyLearnedCategories = new ArrayList<>();
     ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
-    //ArrayList<Entry> yvalues = new ArrayList<>();
-    //PieDataSet dataSet;
-    //Legend legend = new Legend();
-    //PieData data = new PieData();
-    //ArrayList<String> xVals = new ArrayList<>();
     TextView ansPercent;
-    //Cursor cursor;
     String categoryName;
     String accountName;
     String callingActivity;
@@ -69,11 +64,12 @@ public class LearningSummaryActivity extends AppCompatActivity {
     float allAnswers;
     float goodAnsPercent;
     DecimalFormat df;
-    //PieChart pieChart;
     DateFormat dateFormat;
     String localTime;
     Date currentLocalTime;
     Calendar cal;
+    ImageView howsGoinIV;
+    TextView howsGoinTV;
 
     public static int fib(int n){
         if ((n==1)||(n==2))
@@ -103,35 +99,23 @@ public class LearningSummaryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"));
-        //cal.add(Calendar.DATE, 120);
         currentLocalTime = cal.getTime();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
         localTime = dateFormat.format(currentLocalTime);
-
         setContentView(R.layout.activity_learning_summary);
         WordsDbHelper wordsDbHelper = new WordsDbHelper(this);
         WordListContract.myWordsDB = wordsDbHelper.getWritableDatabase();
-        //pieChart = (PieChart) findViewById(R.id.pieChart);
-        //pieChart.setUsePercentValues(true);
         ansPercent = (TextView)findViewById(R.id.goodAnsPercentTV);
         callingActivity = getCallingActivity().getClassName();
+        howsGoinIV = (ImageView)findViewById(R.id.howsGoingIV);
+        howsGoinTV = (TextView)findViewById(R.id.howsGoingTV);
         Log.v("TAG", "Calling activity: " + callingActivity);
         Intent intent = getIntent();
 
         switch (callingActivity){
-            case "com.example.blazej.languagelearner.ListenActivity":
-                ///////////////////////
-                Cursor myCursor1 = WordAccountStatusContract.getWordAccountStatusCursor();
-                if(myCursor1.getCount() > 0){
-                    while(myCursor1.moveToNext()){
-                        Log.v("TAG", myCursor1.getString(1) + " -- " + myCursor1.getString(2) + " -- "  + myCursor1.getString(3) + " -- "  + myCursor1.getInt(4));
-                    }
-                }else{
-                    Log.v("TAG", "Kursor pusty?!?!?!");
-                }
-                myCursor1.close();
-                /////////////////////
+            case "com.example.blazej.languagelearner.LearningToGermanActivity":
+
                 accountName = intent.getStringExtra("account_name");
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
@@ -140,8 +124,6 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 missedWords = intent.getStringArrayListExtra("missed_words");
                 learnedWordsCategory = intent.getStringArrayListExtra("learned_words_category");
                 missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
-                //categoryName = intent.getStringExtra("category_name");
-
                 badAnswers = missedWords.size();
                 goodAnswers = learnedWords.size();
                 allAnswers = goodAnswers + badAnswers;
@@ -154,50 +136,63 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 ansPercent.setText(getString(R.string.good_ans,df.format(goodAnsPercent)));
                 ansPercent.setVisibility(View.VISIBLE);
 
-                /*
-                PieDataSet dataSetLA = new PieDataSet(yvalues, "Wyniki Nauki");
-                Legend legendLA = new Legend();
-                PieData dataLA = new PieData();
-                ArrayList<String> xValsLA = new ArrayList<>();
-                ArrayList<Entry> yvaluesLA = new ArrayList<>();
+                if(germanWordsInCategory.size() < 4){
+                    Log.v("TAG","after LearningToGermanActivity, " + "germanWordsInCategory.size(): " + germanWordsInCategory.size());
+                    for(int i=0; i<missedWords.size();i++){
+                        Log.v("TAG", "missedWords: " + missedWords.get(i));
+                        Log.v("TAG", "missedWordsCategory: " + missedWordsCategory.get(i));
+                    }
 
-                yvaluesLA.add(new Entry(badAnswers, 0));
-                yvaluesLA.add(new Entry(goodAnswers, 1));
-                Log.v("TAG","yvalues: " + yvalues.size());
-                xValsLA.add("Błędne Odpowiedzi");
-                xValsLA.add("Poprawne Odpowiedzi");
-                legendLA.setEnabled(false);
-                dataLA.setValueFormatter(new PercentFormatter());
-                dataLA.setValueTextSize(22f);
-                dataLA.setValueTextColor(Color.DKGRAY);
-                dataLA = new PieData(xValsLA, dataSetLA);
-                pieChart.setData(dataLA);
-                dataSetLA.setColors(ColorTemplate.JOYFUL_COLORS);
-                pieChart.setDrawHoleEnabled(false);
-                pieChart.setScaleX(0.6f);
-                pieChart.setScaleY(0.6f);
-                pieChart.setDescription("");
-                */
-                /*
-                yvalues.add(new Entry(badAnswers, 0));
-                yvalues.add(new Entry(goodAnswers, 1));
-                dataSet = new PieDataSet(yvalues, "Wyniki Nauki");
-                Log.v("TAG","yvalues: " + yvalues.size());
-                xVals.add("Błędne Odpowiedzi");
-                xVals.add("Poprawne Odpowiedzi");
-                legend = pieChart.getLegend();
-                legend.setEnabled(false);
-                data = new PieData(xVals, dataSet);
-                data.setValueFormatter(new PercentFormatter());
-                data.setValueTextSize(22f);
-                data.setValueTextColor(Color.DKGRAY);
-                pieChart.setData(data);
-                dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
-                pieChart.setDrawHoleEnabled(false);
-                pieChart.setScaleX(0.6f);
-                pieChart.setScaleY(0.6f);
-                pieChart.setDescription("");
-*/
+                    for(int i=0; i<learnedWords.size();i++){
+                        Log.v("TAG", "learnedWords: " + learnedWords.get(i));
+                        Log.v("TAG", "learnedWordsCategory: " + learnedWordsCategory.get(i));
+                    }
+                    if(learnedWords.size()>0){
+                        countToX(learnedWords,learnedWordsCategory, 2);
+                    }
+                    if(missedWords.size()>0) {
+                        removeDuplicatesOfMissedWords(missedWords, missedWordsCategory);
+                    }
+                    if(reallyLearnedWords.size()>0) {
+                        addLearnedWordsToBase(reallyLearnedWords);
+                    }
+                    if(missedWords.size()>0) {
+                        addUnLearnedWordsToBase(missedWords);
+                    }
+
+                    Cursor cursor = WordAccountStatusContract.getWordAccountStatusCursor();
+                    if(cursor.getCount() > 0){
+                        while(cursor.moveToNext()){
+                            Log.v("TAG", cursor.getString(1) + " -- " + cursor.getString(2) + " -- "  + cursor.getString(3) + " -- "  + cursor.getInt(4) + " -- "  + cursor.getInt(5) + " -- "  + cursor.getString(6));
+                        }
+                    }else{
+                        Log.v("TAG", "Kursor pusty?!?!?!");
+                    }
+                    //////////////////////////////////////
+                }
+            break;
+            case "com.example.blazej.languagelearner.ListenActivity":
+
+                accountName = intent.getStringExtra("account_name");
+                germanWordsInCategory = intent.getStringArrayListExtra("german_words");
+                polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
+                categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
+                learnedWords = intent.getStringArrayListExtra("learned_words");
+                missedWords = intent.getStringArrayListExtra("missed_words");
+                learnedWordsCategory = intent.getStringArrayListExtra("learned_words_category");
+                missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
+                badAnswers = missedWords.size();
+                goodAnswers = learnedWords.size();
+                allAnswers = goodAnswers + badAnswers;
+                goodAnsPercent = (goodAnswers/allAnswers)*100;
+                df = new DecimalFormat("#.##");
+                df.setRoundingMode(RoundingMode.CEILING);
+                Log.v("TAG","badAnswers: " + badAnswers);
+                Log.v("TAG","allAnswers: " + allAnswers);
+                Log.v("TAG","goodAnsPercent: " + goodAnsPercent);
+                ansPercent.setText(getString(R.string.good_ans,df.format(goodAnsPercent)));
+                ansPercent.setVisibility(View.VISIBLE);
+
                 for(int i=0; i<missedWords.size();i++){
                     Log.v("TAG", "missedWords: " + missedWords.get(i));
                     Log.v("TAG", "missedWordsCategory: " + missedWordsCategory.get(i));
@@ -209,15 +204,11 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 }
 
                 if(learnedWords.size()>0){
-                    countToFive(learnedWords,learnedWordsCategory);
+                    countToX(learnedWords,learnedWordsCategory, 5);
                 }
                 if(missedWords.size()>0) {
                     removeDuplicatesOfMissedWords(missedWords, missedWordsCategory);
                 }
-                //cursor = WordAccountStatusContract.getWordAccountStatusCursor();
-
-                //learnedWordsByAccount = WordAccountStatusContract.getWordAccountStatusCursorWithSpecificAccountLearned(accountName);
-                //Log.v("TAG","learnedWordsByAccount(cursor) size: " + learnedWordsByAccount.getCount());
 
                 if(reallyLearnedWords.size()>0) {
                     addLearnedWordsToBase(reallyLearnedWords);
@@ -261,28 +252,22 @@ public class LearningSummaryActivity extends AppCompatActivity {
 
                 ansPercent.setText(getString(R.string.good_ans,df.format(goodAnsPercent)));
                 ansPercent.setVisibility(View.VISIBLE);
-/*
-                yvalues.add(new Entry(badAnswers, 0));
-                yvalues.add(new Entry(goodAnswers, 1));
-                dataSet = new PieDataSet(yvalues, "Wyniki Nauki");
-                Log.v("TAG","yvalues: " + yvalues.size());
-                xVals.add("Błędne Odpowiedzi");
-                xVals.add("Poprawne Odpowiedzi");
-                legend = pieChart.getLegend();
-                legend.setEnabled(false);
-                data = new PieData(xVals, dataSet);
-                data.setValueFormatter(new PercentFormatter());
-                data.setValueTextSize(22f);
-                data.setValueTextColor(Color.DKGRAY);
-                pieChart.setData(data);
-                dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
-                pieChart.setDrawHoleEnabled(false);
-                pieChart.setScaleX(0.6f);
-                pieChart.setScaleY(0.6f);
-                pieChart.setDescription("");
-                */
+
                 break;
         }
+       if(goodAnsPercent <30.0){
+           howsGoinTV.setText("Słabo, następnym razem się popraw!");
+           howsGoinIV.setImageResource(R.drawable.sad);
+       }else if (goodAnsPercent >= 30.0 && goodAnsPercent <50.0){
+           howsGoinTV.setText("Mogło być lepiej");
+           howsGoinIV.setImageResource(R.drawable.anyway);
+       }else if (goodAnsPercent >= 50.0 && goodAnsPercent <80.0){
+           howsGoinTV.setText("Jest dobrze!");
+           howsGoinIV.setImageResource(R.drawable.happy);
+       }else if (goodAnsPercent >= 80.0){
+           howsGoinTV.setText("Jesteś niesamowity, tak trzymaj!");
+           howsGoinIV.setImageResource(R.drawable.lovely);
+       }
     }
 
     private int getSpecificLearnCounterWordByAccount(String word, String categoryName, Cursor learnedWordsByAccount){
@@ -428,9 +413,9 @@ public class LearningSummaryActivity extends AppCompatActivity {
         }
     }
 
-    private void countToFive(ArrayList<String> learnedWords,ArrayList<String> learnedWordsCategory){
+    private void countToX(ArrayList<String> learnedWords,ArrayList<String> learnedWordsCategory,int counter){
         for(int i=0;i<learnedWords.size();i++){
-            if(Collections.frequency(learnedWords,learnedWords.get(i)) > 4){
+            if(Collections.frequency(learnedWords,learnedWords.get(i)) > counter - 1){
                if(!reallyLearnedWords.contains(learnedWords.get(i))) {
                    reallyLearnedWords.add(learnedWords.get(i));
                    reallyLearnedCategories.add(learnedWordsCategory.get(i));
@@ -454,8 +439,13 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 myIntent = new Intent(this, LearningToGermanActivity.class);
                 break;
             case "com.example.blazej.languagelearner.LearningToGermanActivity":
-                myIntent = new Intent(this, ChoosingToPolishActivity.class);
-                break;
+                if(germanWordsInCategory.size() > 3) {
+                    myIntent = new Intent(this, ChoosingToPolishActivity.class);
+                    break;
+                }else{
+                    myIntent = new Intent(this, MenuActivity.class);
+                    break;
+                }
             case "com.example.blazej.languagelearner.ChoosingToPolishActivity":
                 myIntent = new Intent(this, ChoosingToGermanActivity.class);
                 break;

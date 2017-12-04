@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,7 +44,8 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
     Button ans4BTN;
     int goodAnsIndex;
     ArrayList<Button> myButtonList = new ArrayList<>();
-
+    AlphaAnimation fadeIn = new AlphaAnimation(0.0f , 1.0f ) ;
+    AlphaAnimation fadeOut = new AlphaAnimation( 1.0f , 0.0f ) ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -191,7 +193,6 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
 
             }
         }else{
-            Toast.makeText(this, "Koniec Pytań!", Toast.LENGTH_SHORT).show();
             showResult();
         }
     }
@@ -246,13 +247,6 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
                     yourAnswerTV.setTextColor(Color.WHITE);
                 }
                 rightAnswerTV.setText(getString(R.string.your_answer,rightAnswer));
-                rightAnswerTV.setVisibility(View.VISIBLE);
-                yourAnswerTV.setVisibility(View.VISIBLE);
-                ans1BTN.setVisibility(View.INVISIBLE);
-                ans2BTN.setVisibility(View.INVISIBLE);
-                ans3BTN.setVisibility(View.INVISIBLE);
-                ans4BTN.setVisibility(View.INVISIBLE);
-                nextQuestionBTN.setVisibility(View.VISIBLE);
                 break;
             case R.id.ans2BTN:
                 if(goodAnsIndex == 1){
@@ -267,13 +261,6 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
                     yourAnswerTV.setTextColor(Color.WHITE);
                 }
                 rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
-                rightAnswerTV.setVisibility(View.VISIBLE);
-                yourAnswerTV.setVisibility(View.VISIBLE);
-                ans1BTN.setVisibility(View.INVISIBLE);
-                ans2BTN.setVisibility(View.INVISIBLE);
-                ans3BTN.setVisibility(View.INVISIBLE);
-                ans4BTN.setVisibility(View.INVISIBLE);
-                nextQuestionBTN.setVisibility(View.VISIBLE);
                 break;
             case R.id.ans3BTN:
                 if(goodAnsIndex == 2){
@@ -288,13 +275,6 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
                     yourAnswerTV.setTextColor(Color.WHITE);
                 }
                 rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
-                rightAnswerTV.setVisibility(View.VISIBLE);
-                yourAnswerTV.setVisibility(View.VISIBLE);
-                ans1BTN.setVisibility(View.INVISIBLE);
-                ans2BTN.setVisibility(View.INVISIBLE);
-                ans3BTN.setVisibility(View.INVISIBLE);
-                ans4BTN.setVisibility(View.INVISIBLE);
-                nextQuestionBTN.setVisibility(View.VISIBLE);
                 break;
             case R.id.ans4BTN:
                 if(goodAnsIndex == 3){
@@ -309,18 +289,20 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
                     yourAnswerTV.setTextColor(Color.WHITE);
                 }
                 rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
-                rightAnswerTV.setVisibility(View.VISIBLE);
-                yourAnswerTV.setVisibility(View.VISIBLE);
-                ans1BTN.setVisibility(View.INVISIBLE);
-                ans2BTN.setVisibility(View.INVISIBLE);
-                ans3BTN.setVisibility(View.INVISIBLE);
-                ans4BTN.setVisibility(View.INVISIBLE);
-                nextQuestionBTN.setVisibility(View.VISIBLE);
                 break;
             default:
                 Log.v("TAG", "Zaden z przycisków");
                 break;
         }
+        rightAnswerTV.startAnimation(fadeIn);
+        yourAnswerTV.startAnimation(fadeIn);
+        fadeIn.setDuration(800);
+        fadeIn.setFillAfter(true);
+        ans1BTN.setVisibility(View.INVISIBLE);
+        ans2BTN.setVisibility(View.INVISIBLE);
+        ans3BTN.setVisibility(View.INVISIBLE);
+        ans4BTN.setVisibility(View.INVISIBLE);
+        nextQuestionBTN.setVisibility(View.VISIBLE);
     }
 
     public void nextQuestionBTN(View view) {
@@ -330,8 +312,10 @@ public class ChoosingToPolishActivity extends AppCompatActivity implements View.
         ans3BTN.setVisibility(View.VISIBLE);
         ans4BTN.setVisibility(View.VISIBLE);
         nextQuestionBTN.setVisibility(View.INVISIBLE);
-        rightAnswerTV.setVisibility(View.INVISIBLE);
-        yourAnswerTV.setVisibility(View.INVISIBLE);
+        rightAnswerTV.startAnimation(fadeOut);
+        yourAnswerTV.startAnimation(fadeOut);
+        fadeOut.setDuration(100);
+        fadeOut.setFillAfter(true);
         questionCore(questionCount,currentQuestion);
     }
 }

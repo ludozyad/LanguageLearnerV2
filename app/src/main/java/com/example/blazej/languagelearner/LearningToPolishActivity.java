@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -55,6 +56,9 @@ public class LearningToPolishActivity extends AppCompatActivity {
     ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
     String categoryName;
     Cursor wordAccountStatusCursor;
+
+    AlphaAnimation fadeIn = new AlphaAnimation(0.0f , 1.0f ) ;
+    AlphaAnimation fadeOut = new AlphaAnimation( 1.0f , 0.0f ) ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,14 +158,17 @@ public class LearningToPolishActivity extends AppCompatActivity {
             germanWord = germanWordsInCategory.get(index);
             toLearnWordTV.setText(germanWord);
         }else{
-            Toast.makeText(this, "Koniec Pytań!", Toast.LENGTH_SHORT).show();
             showResult();
         }
     }
 
     public void nextQuestionBTN(View view) {
-        rightAnswerTV.setVisibility(View.INVISIBLE);
-        yourAnswerTV.setVisibility(View.INVISIBLE);
+        rightAnswerTV.startAnimation(fadeOut);
+        yourAnswerTV.startAnimation(fadeOut);
+        fadeOut.setDuration(800);
+        fadeOut.setFillAfter(true);
+        //rightAnswerTV.setVisibility(View.INVISIBLE);
+        //yourAnswerTV.setVisibility(View.INVISIBLE);
         checkAnswerBTN.setVisibility(View.VISIBLE);
         enterWordET.setVisibility(View.VISIBLE);
         nextQuestionBTN.setVisibility(View.INVISIBLE);
@@ -191,8 +198,12 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                 yourAnswerTV.setTextColor(Color.WHITE);
             }
-            rightAnswerTV.setVisibility(View.VISIBLE);
-            yourAnswerTV.setVisibility(View.VISIBLE);
+            //rightAnswerTV.setVisibility(View.VISIBLE);
+            //yourAnswerTV.setVisibility(View.VISIBLE);
+            rightAnswerTV.startAnimation(fadeIn);
+            yourAnswerTV.startAnimation(fadeIn);
+            fadeIn.setDuration(1200);
+            fadeIn.setFillAfter(true);
             checkAnswerBTN.setVisibility(View.INVISIBLE);
             enterWordET.getText().clear();
             enterWordET.setVisibility(View.INVISIBLE);

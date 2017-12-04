@@ -78,11 +78,6 @@ public class ChooseCategoryActivity extends AppCompatActivity {
             categoriesNames.add(myCategories.getString(0));
         }
         String[] myCategoriesArray = categoriesNames.toArray(new String[categoriesNames.size()]);
-        //final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-         //       android.R.layout.simple_list_item_1, android.R.id.text1, myCategoriesArray);
-
-        //ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.my_text_view, myCategoriesArray);
-        //categoriesListView.setAdapter(adapter);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
                 android.R.layout.simple_list_item_1, myCategoriesArray) {
@@ -109,20 +104,20 @@ public class ChooseCategoryActivity extends AppCompatActivity {
                 Log.v("TAG", "germanWordsToLearnArray size: " + germanWordsToLearnArray.size());
                 Log.v("TAG", "polishWordsToLearnArray size: " + polishWordsToLearnArray.size());
 
-                if(germanWordsToLearnArray.size() > 3) {
+                if(germanWordsToLearnArray.size() > 0) {
                     categoryCountBTN.setVisibility(View.VISIBLE);
                     chooseCategoryTV.setVisibility(View.VISIBLE);
                     categoryCountTV.setVisibility(View.VISIBLE);
-                    Log.v("TAG", "germanWordsToLearnArray.size() > 3");
-                    if(germanWordsToLearnArray.size()<7){
-                        Toast.makeText(getApplicationContext(),"Wprowadź cyfre z zakresu 4 do " + germanWordsToLearnArray.size(),Toast.LENGTH_SHORT).show();
+                    Log.v("TAG", "germanWordsToLearnArray.size() > 0");
+                    if(germanWordsToLearnArray.size()<6){
+                        Toast.makeText(getApplicationContext(),"Wprowadź cyfre z zakresu 1 do " + germanWordsToLearnArray.size(),Toast.LENGTH_SHORT).show();
                         pickNumberET.setText("");
                         pickNumberET.setVisibility(View.VISIBLE);
                         numberPicker.setVisibility(View.INVISIBLE);
                     }else{
                         pickNumberET.setVisibility(View.INVISIBLE);
                         numberPicker.setVisibility(View.VISIBLE);
-                        numberPicker.setMinValue(4);
+                        numberPicker.setMinValue(1);
                         numberPicker.setMaxValue(germanWordsToLearnArray.size());
                     }
                 }else {
@@ -130,9 +125,6 @@ public class ChooseCategoryActivity extends AppCompatActivity {
                     numberPicker.setVisibility(View.INVISIBLE);
                     categoryCountBTN.setVisibility(View.INVISIBLE);
                     categoryCountTV.setVisibility(View.INVISIBLE);
-                    //numberPicker.setMinValue(0);
-                    //numberPicker.setMaxValue(0);
-                    //numberPicker.setValue(0);
                 }
             }
         });
@@ -225,16 +217,18 @@ public class ChooseCategoryActivity extends AppCompatActivity {
     }
 
     public void startLearningActivity(View view) {
-        if(germanWordsToLearnArray.size()> 0 && germanWordsToLearnArray.size() < 7){
+        if(germanWordsToLearnArray.size()> 0 && germanWordsToLearnArray.size() < 6){
             selectedCategoryCount = Integer.parseInt(pickNumberET.getText().toString());
-        }else if (germanWordsToLearnArray.size() >= 7){
+        }else if (germanWordsToLearnArray.size() >= 6){
             selectedCategoryCount = numberPicker.getValue();
         }else{
             selectedCategoryCount=0;
         }
-        if (selectedCategoryCount < 4) {
-            Toast.makeText(this, "Za mało słów do nauki, wybierz inną kategorię.", Toast.LENGTH_SHORT).show();
-        } else if(selectedCategoryCount > 3 && selectedCategoryCount <= germanWordsToLearnArray.size()){
+        //if (selectedCategoryCount < 4) {
+        //    Toast.makeText(this, "Za mało słów do nauki, wybierz inną kategorię.", Toast.LENGTH_SHORT).show();
+        //}
+        //else
+        if(selectedCategoryCount > 0 && selectedCategoryCount <= germanWordsToLearnArray.size()){
             Intent myIntent = new Intent(getApplicationContext(), LearningToPolishActivity.class);
             myIntent.putExtra("category_name", categoryName);
             myIntent.putExtra("category_count", selectedCategoryCount);
@@ -244,7 +238,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
             Log.v("TAG", "germanWordsToLearnArray: " + germanWordsToLearnArray.size() + " polishWordsToLearnArray: " + polishWordsToLearnArray.size() + " categoriesOfWordsArrayList.size(): " + categoriesOfWordsArrayList.size());
             startActivityForResult(myIntent, 1);
         } else if(selectedCategoryCount > germanWordsToLearnArray.size()){
-            Toast.makeText(this,"Wprowadź cyfre z zakresu 4 do " + germanWordsToLearnArray.size(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Wprowadź cyfre z zakresu 1 do " + germanWordsToLearnArray.size(),Toast.LENGTH_SHORT).show();
             pickNumberET.setText("");
         }
     }

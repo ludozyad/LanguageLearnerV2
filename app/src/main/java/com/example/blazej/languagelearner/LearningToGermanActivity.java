@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -42,6 +43,8 @@ public class LearningToGermanActivity extends AppCompatActivity {
     String categoryName;
     String accountName;
     Cursor wordAccountStatusCursor;
+    AlphaAnimation fadeIn = new AlphaAnimation(0.0f , 1.0f ) ;
+    AlphaAnimation fadeOut = new AlphaAnimation( 1.0f , 0.0f ) ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +83,6 @@ public class LearningToGermanActivity extends AppCompatActivity {
         //selectedCategoryTV.setText(categoryName);
         questionCount = germanWordsInCategory.size();
         wordAccountStatusCursor = WordAccountStatusContract.getWordAccountStatusCursor();
-        //TODO sprawdzic czy dziala XD
         questionCore(questionCount, currentQuestion);
     }
 
@@ -105,8 +107,10 @@ public class LearningToGermanActivity extends AppCompatActivity {
     }
 
     public void nextQuestionBTN(View view) {
-        rightAnswerTV.setVisibility(View.INVISIBLE);
-        yourAnswerTV.setVisibility(View.INVISIBLE);
+        rightAnswerTV.startAnimation(fadeOut);
+        yourAnswerTV.startAnimation(fadeOut);
+        fadeOut.setDuration(100);
+        fadeOut.setFillAfter(true);
         checkAnswerBTN.setVisibility(View.VISIBLE);
         enterWordET.setVisibility(View.VISIBLE);
         nextQuestionBTN.setVisibility(View.INVISIBLE);
@@ -135,8 +139,10 @@ public class LearningToGermanActivity extends AppCompatActivity {
                 missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                 yourAnswerTV.setTextColor(Color.WHITE);
             }
-            rightAnswerTV.setVisibility(View.VISIBLE);
-            yourAnswerTV.setVisibility(View.VISIBLE);
+            rightAnswerTV.startAnimation(fadeIn);
+            yourAnswerTV.startAnimation(fadeIn);
+            fadeIn.setDuration(800);
+            fadeIn.setFillAfter(true);
             checkAnswerBTN.setVisibility(View.INVISIBLE);
             enterWordET.getText().clear();
             enterWordET.setVisibility(View.INVISIBLE);
@@ -148,6 +154,7 @@ public class LearningToGermanActivity extends AppCompatActivity {
     }
 
     private void showResult() {
+
         Intent myIntent = new Intent(this,LearningSummaryActivity.class);
         myIntent.putStringArrayListExtra("german_words",germanWordsInCategory);
         myIntent.putStringArrayListExtra("polish_words",polishWordsInCategory);
