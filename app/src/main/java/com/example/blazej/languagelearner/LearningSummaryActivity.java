@@ -16,15 +16,7 @@ import android.widget.TextView;
 import com.example.blazej.languagelearner.data.WordAccountStatusContract;
 import com.example.blazej.languagelearner.data.WordListContract;
 import com.example.blazej.languagelearner.data.WordsDbHelper;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
+
 
 import java.math.RoundingMode;
 import java.text.DateFormat;
@@ -78,21 +70,17 @@ public class LearningSummaryActivity extends AppCompatActivity {
             return fib(n-1)+fib(n-2);
     }
 
-    private void changeDate(int learnedCount){
+    private String changeDate(int learnedCount, Calendar currentCal, DateFormat localDateFormat){
         int dateFromToday;
-        cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"));
         if(learnedCount == 0){
             dateFromToday = 1;
         }else{
             dateFromToday = fib(learnedCount + 2);
         }
-        Log.v("TAG","learnedCount: " + learnedCount);
-        Log.v("TAG","dateFromToday: " + dateFromToday);
-        cal.add(Calendar.DATE, dateFromToday);
-        currentLocalTime = cal.getTime();
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
-        localTime = dateFormat.format(currentLocalTime);
+        currentCal.add(Calendar.DATE, dateFromToday);
+        Date currentLocalTime = currentCal.getTime();
+        currentCal.add(Calendar.DATE, -dateFromToday);
+        return localDateFormat.format(currentLocalTime);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,12 +98,10 @@ public class LearningSummaryActivity extends AppCompatActivity {
         callingActivity = getCallingActivity().getClassName();
         howsGoinIV = (ImageView)findViewById(R.id.howsGoingIV);
         howsGoinTV = (TextView)findViewById(R.id.howsGoingTV);
-        Log.v("TAG", "Calling activity: " + callingActivity);
         Intent intent = getIntent();
 
         switch (callingActivity){
             case "com.example.blazej.languagelearner.LearningToGermanActivity":
-
                 accountName = intent.getStringExtra("account_name");
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
@@ -130,23 +116,11 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 goodAnsPercent = (goodAnswers/allAnswers)*100;
                 df = new DecimalFormat("#.##");
                 df.setRoundingMode(RoundingMode.CEILING);
-                Log.v("TAG","badAnswers: " + badAnswers);
-                Log.v("TAG","allAnswers: " + allAnswers);
-                Log.v("TAG","goodAnsPercent: " + goodAnsPercent);
                 ansPercent.setText(getString(R.string.good_ans,df.format(goodAnsPercent)));
                 ansPercent.setVisibility(View.VISIBLE);
 
                 if(germanWordsInCategory.size() < 4){
-                    Log.v("TAG","after LearningToGermanActivity, " + "germanWordsInCategory.size(): " + germanWordsInCategory.size());
-                    for(int i=0; i<missedWords.size();i++){
-                        Log.v("TAG", "missedWords: " + missedWords.get(i));
-                        Log.v("TAG", "missedWordsCategory: " + missedWordsCategory.get(i));
-                    }
 
-                    for(int i=0; i<learnedWords.size();i++){
-                        Log.v("TAG", "learnedWords: " + learnedWords.get(i));
-                        Log.v("TAG", "learnedWordsCategory: " + learnedWordsCategory.get(i));
-                    }
                     if(learnedWords.size()>0){
                         countToX(learnedWords,learnedWordsCategory, 2);
                     }
@@ -160,19 +134,13 @@ public class LearningSummaryActivity extends AppCompatActivity {
                         addUnLearnedWordsToBase(missedWords);
                     }
 
-                    Cursor cursor = WordAccountStatusContract.getWordAccountStatusCursor();
-                    if(cursor.getCount() > 0){
-                        while(cursor.moveToNext()){
-                            Log.v("TAG", cursor.getString(1) + " -- " + cursor.getString(2) + " -- "  + cursor.getString(3) + " -- "  + cursor.getInt(4) + " -- "  + cursor.getInt(5) + " -- "  + cursor.getString(6));
-                        }
-                    }else{
-                        Log.v("TAG", "Kursor pusty?!?!?!");
+                    if(missedWords.size() > 0 || reallyLearnedWords.size() > 0) {
+                        addWordsToDailyBase(missedWords, reallyLearnedWords);
                     }
-                    //////////////////////////////////////
+
                 }
             break;
             case "com.example.blazej.languagelearner.ListenActivity":
-
                 accountName = intent.getStringExtra("account_name");
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
@@ -187,21 +155,8 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 goodAnsPercent = (goodAnswers/allAnswers)*100;
                 df = new DecimalFormat("#.##");
                 df.setRoundingMode(RoundingMode.CEILING);
-                Log.v("TAG","badAnswers: " + badAnswers);
-                Log.v("TAG","allAnswers: " + allAnswers);
-                Log.v("TAG","goodAnsPercent: " + goodAnsPercent);
                 ansPercent.setText(getString(R.string.good_ans,df.format(goodAnsPercent)));
                 ansPercent.setVisibility(View.VISIBLE);
-
-                for(int i=0; i<missedWords.size();i++){
-                    Log.v("TAG", "missedWords: " + missedWords.get(i));
-                    Log.v("TAG", "missedWordsCategory: " + missedWordsCategory.get(i));
-                }
-
-                for(int i=0; i<learnedWords.size();i++){
-                    Log.v("TAG", "learnedWords: " + learnedWords.get(i));
-                    Log.v("TAG", "learnedWordsCategory: " + learnedWordsCategory.get(i));
-                }
 
                 if(learnedWords.size()>0){
                     countToX(learnedWords,learnedWordsCategory, 5);
@@ -217,6 +172,9 @@ public class LearningSummaryActivity extends AppCompatActivity {
                     addUnLearnedWordsToBase(missedWords);
                 }
 
+                if(missedWords.size() > 0 || reallyLearnedWords.size() > 0) {
+                    addWordsToDailyBase(missedWords, reallyLearnedWords);
+                }
 
                 Cursor cursor = WordAccountStatusContract.getWordAccountStatusCursor();
                 if(cursor.getCount() > 0){
@@ -224,9 +182,8 @@ public class LearningSummaryActivity extends AppCompatActivity {
                         Log.v("TAG", cursor.getString(1) + " -- " + cursor.getString(2) + " -- "  + cursor.getString(3) + " -- "  + cursor.getInt(4) + " -- "  + cursor.getInt(5) + " -- "  + cursor.getString(6));
                     }
                 }else{
-                    Log.v("TAG", "Kursor pusty?!?!?!");
+                    Log.v("TAG", "Kursor pusty");
                 }
-                //////////////////////////////////////
                 break;
 
             default:
@@ -238,7 +195,6 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 missedWords = intent.getStringArrayListExtra("missed_words");
                 learnedWordsCategory = intent.getStringArrayListExtra("learned_words_category");
                 missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
-                //categoryName = intent.getStringExtra("category_name");
 
                 badAnswers = missedWords.size();
                 goodAnswers = learnedWords.size();
@@ -246,10 +202,6 @@ public class LearningSummaryActivity extends AppCompatActivity {
                 goodAnsPercent = (goodAnswers/allAnswers)*100;
                 df = new DecimalFormat("#.##");
                 df.setRoundingMode(RoundingMode.CEILING);
-                Log.v("TAG","badAnswers: " + badAnswers);
-                Log.v("TAG","allAnswers: " + allAnswers);
-                Log.v("TAG","goodAnsPercent: " + goodAnsPercent);
-
                 ansPercent.setText(getString(R.string.good_ans,df.format(goodAnsPercent)));
                 ansPercent.setVisibility(View.VISIBLE);
 
@@ -272,11 +224,9 @@ public class LearningSummaryActivity extends AppCompatActivity {
 
     private int getSpecificLearnCounterWordByAccount(String word, String categoryName, Cursor learnedWordsByAccount){
         int learnCount = 0;
-        Log.v("TAG","z getSpecificLearnCounterWordByAccount learnedWordsByAccount count: " + learnedWordsByAccount.getCount());
         while(learnedWordsByAccount.moveToNext()){
             if(learnedWordsByAccount.getString(1).equals(word)&&learnedWordsByAccount.getString(2).equals(categoryName)){
                 learnCount = learnedWordsByAccount.getInt(5);
-                Log.v("TAG", "Znaleziono słowo, learnCount to: " + learnCount);
             }
         }
         return learnCount;
@@ -290,22 +240,13 @@ public class LearningSummaryActivity extends AppCompatActivity {
     private void removeDuplicatesOfMissedWords(ArrayList<String> missedWords,ArrayList<String> missedWordsCategory){
         ArrayList<String> missedWordsTemp = new ArrayList<>();
         ArrayList<String> catOfWordsTemp = new ArrayList<>();
-        Log.v("TAG", "missedWords: " + missedWords.size());
-
         missedWordsTemp.add(missedWords.get(0));
         catOfWordsTemp.add(missedWordsCategory.get(0));
-
         for(int i=0; i < missedWords.size(); i++){
             if(!missedWordsTemp.contains(missedWords.get(i))){
                 missedWordsTemp.add(missedWords.get(i));
                 catOfWordsTemp.add(missedWordsCategory.get(i));
             }
-        }
-        for(int i=0;i<missedWordsTemp.size();i++){
-            Log.v("TAG","missedWordsTemp: " + missedWordsTemp.get(i));
-        }
-        for(int i=0;i<catOfWordsTemp.size();i++){
-            Log.v("TAG","catOfWordsTemp: " + catOfWordsTemp.get(i));
         }
         this.missedWords.clear();
         this.missedWords = missedWordsTemp;
@@ -313,101 +254,153 @@ public class LearningSummaryActivity extends AppCompatActivity {
         this.missedWordsCategory = catOfWordsTemp;
     }
 
+    private void addWordsToDailyBase(ArrayList<String> missedWords, ArrayList<String> learnedWords) {
+        String missedCat;
+        if (missedWords.size() > 0) {
+            for (int i = 0; i < missedWords.size(); i++) {
+                missedCat = missedWordsCategory.get(i);
+                if (!WordAccountStatusContract.ifWordStatisticCursorContain(missedWords.get(i), missedCat, accountName, 0, localTime) &&
+                        (!WordAccountStatusContract.ifWordStatisticCursorContain(missedWords.get(i), missedCat, accountName, 1, localTime))) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.POLISH_COLUMN_NAME, missedWords.get(i));
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.CATEGORY_COLUMN_NAME, missedCat);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_IS_LEARNED, 0);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_LEARNED_FORGOT_DATE, localTime);
+                    WordAccountStatusContract.myIsLearnedDB.insert(WordAccountStatusContract.WordStatisticColumnsEntry.TABLE_NAME, null, cv);
+                    cv.clear();
+                } else if (WordAccountStatusContract.ifWordStatisticCursorContain(missedWords.get(i), missedCat, accountName, 1, localTime)) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.POLISH_COLUMN_NAME, missedWords.get(i));
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_IS_LEARNED, 0);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_LEARNED_FORGOT_DATE, localTime);
+                    String whereClause = WordAccountStatusContract.WordStatisticColumnsEntry.CATEGORY_COLUMN_NAME + " = " + "'" + missedCat + "'" + " AND " +
+                            WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_ACCOUNT_NAME + " = " + "'" + accountName + "'" + " AND " +
+                            WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_LEARNED_FORGOT_DATE + " = " + "'" + localTime + "'" + " AND " +
+                            WordAccountStatusContract.WordStatisticColumnsEntry.POLISH_COLUMN_NAME + " = " + "'" + missedWords.get(i) + "'";
+                    WordAccountStatusContract.myIsLearnedDB.update(WordAccountStatusContract.WordStatisticColumnsEntry.TABLE_NAME, cv, whereClause, null);
+                    cv.clear();
+                } else if (WordAccountStatusContract.ifWordStatisticCursorContain(missedWords.get(i), missedCat, accountName, 0, localTime)) {
+
+                }
+
+            }
+        }
+        String learnedCat;
+        if (learnedWords.size() > 0) {
+            for (int i = 0; i < learnedWords.size(); i++) {
+                learnedCat = reallyLearnedCategories.get(i);
+                if (!WordAccountStatusContract.ifWordStatisticCursorContain(learnedWords.get(i), learnedCat, accountName, 0, localTime) &&
+                        (!WordAccountStatusContract.ifWordStatisticCursorContain(learnedWords.get(i), learnedCat, accountName, 1, localTime))) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.POLISH_COLUMN_NAME, learnedWords.get(i));
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.CATEGORY_COLUMN_NAME, learnedCat);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_IS_LEARNED, 1);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_LEARNED_FORGOT_DATE, localTime);
+                    WordAccountStatusContract.myIsLearnedDB.insert(WordAccountStatusContract.WordStatisticColumnsEntry.TABLE_NAME, null, cv);
+                    cv.clear();
+                } else if (WordAccountStatusContract.ifWordStatisticCursorContain(learnedWords.get(i), learnedCat, accountName, 0, localTime)) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.POLISH_COLUMN_NAME, learnedWords.get(i));
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.CATEGORY_COLUMN_NAME, learnedCat);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_IS_LEARNED, 1);
+                    cv.put(WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_LEARNED_FORGOT_DATE, localTime);
+                    String whereClause = WordAccountStatusContract.WordStatisticColumnsEntry.CATEGORY_COLUMN_NAME + " = " + "'" + learnedCat + "'" + " AND " +
+                            WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_ACCOUNT_NAME + " = " + "'" + accountName + "'" + " AND " +
+                            WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_LEARNED_FORGOT_DATE + " = " + "'" + localTime + "'" + " AND " +
+                            WordAccountStatusContract.WordStatisticColumnsEntry.POLISH_COLUMN_NAME + " = " + "'" + learnedWords.get(i) + "'";
+                    WordAccountStatusContract.myIsLearnedDB.update(WordAccountStatusContract.WordStatisticColumnsEntry.TABLE_NAME, cv, whereClause, null);
+                    cv.clear();
+                } else if (WordAccountStatusContract.ifWordStatisticCursorContain(learnedWords.get(i), learnedCat, accountName, 1, localTime)) {
+
+                }
+            }
+        }
+    }
+
     private void addUnLearnedWordsToBase(ArrayList<String> missedWords){
-        Log.v("TAG", "unlearnedwords size: " + missedWords.size());
         for(int i=0; i < missedWords.size(); i++) {
             if (missedWordsCategory.size() > 0){
                 categoryName = missedWordsCategory.get(i);
             }
-            changeDate(0);
-            Log.v("TAG", "Category name: " + categoryName);
             if (WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,1)) {
-                Log.v("TAG", "Baza zawiera takie słowo, ale jest nauczone - zmieniamy na zapomniane(wtf): " + missedWords.get(i));
                 ContentValues cv = new ContentValues();
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, missedWords.get(i));
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED, 0);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED_COUNTER, 0);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_REVIEW_DATE, localTime);
-                String whereClause = WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = "  + "'" + categoryName+ "'"  + " AND " +
-                        WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = " + "'" + accountName +  "'" + " AND " +
-                        WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME +   " = " +  "'" + missedWords.get(i) + "'";
-                WordAccountStatusContract.myIsLearnedDB.update(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME,cv,whereClause,null);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.POLISH_COLUMN_NAME, missedWords.get(i));
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_IS_LEARNED, 0);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_IS_LEARNED_COUNTER, 0);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_REVIEW_DATE, changeDate(0,cal,dateFormat));
+                String whereClause = WordAccountStatusContract.WordAccountStatusColumnsEntry.CATEGORY_COLUMN_NAME + " = "  + "'" + categoryName+ "'"  + " AND " +
+                        WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_ACCOUNT_NAME + " = " + "'" + accountName +  "'" + " AND " +
+                        WordAccountStatusContract.WordAccountStatusColumnsEntry.POLISH_COLUMN_NAME +   " = " +  "'" + missedWords.get(i) + "'";
+                WordAccountStatusContract.myIsLearnedDB.update(WordAccountStatusContract.WordAccountStatusColumnsEntry.TABLE_NAME,cv,whereClause,null);
                 cv.clear();
             }else if (WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,0)){
-                Log.v("TAG", "Baza zawiera takie nienauczone słowo: " + missedWords.get(i));
+
             }else if ((!WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,1)) ||
                     (!WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,0))) {
-                Log.v("TAG", "Baza nie zawiera takiego słowa, dodajemy jako nienauczone: " + missedWords.get(i));
                 ContentValues cv = new ContentValues();
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, missedWords.get(i));
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED, 0);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED_COUNTER, 0);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_REVIEW_DATE, localTime);
-                WordAccountStatusContract.myIsLearnedDB.insert(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME, null, cv);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.POLISH_COLUMN_NAME, missedWords.get(i));
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_IS_LEARNED, 0);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_IS_LEARNED_COUNTER, 0);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_REVIEW_DATE, changeDate(0,cal,dateFormat));
+                WordAccountStatusContract.myIsLearnedDB.insert(WordAccountStatusContract.WordAccountStatusColumnsEntry.TABLE_NAME, null, cv);
                 cv.clear();
             }
         }
     }
 
     private void addLearnedWordsToBase(ArrayList<String> reallyLearnedWords) {
-        Log.v("TAG","reallyLearnedWords size: " + reallyLearnedWords.size());
-        Log.v("TAG","reallyLearnedCategories size: " + reallyLearnedCategories.size());
-
         for(int i=0; i < reallyLearnedWords.size(); i++) {
             if (reallyLearnedCategories.size() > 0) {
                 categoryName = reallyLearnedCategories.get(i);
             }
-            Log.v("TAG", "reallyLearnedWords: " + reallyLearnedWords.get(i));
             if (WordAccountStatusContract.ifWordAccountStatusCursorContain(reallyLearnedWords.get(i),categoryName,accountName,0)) {
-                Log.v("TAG", "Baza zawiera takie słowo, ale jest nienauczone: " + reallyLearnedWords.get(i));
-                changeDate(1);
                 ContentValues cv = new ContentValues();
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, reallyLearnedWords.get(i));
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED, 1);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED_COUNTER, 1);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_REVIEW_DATE, localTime);
-                String whereClause = WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = "  + "'" + categoryName+ "'"  + " AND " +
-                        WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = " + "'" + accountName +  "'" + " AND " +
-                        WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME +   " = " +  "'" + reallyLearnedWords.get(i) + "'";
-                WordAccountStatusContract.myIsLearnedDB.update(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME,cv,whereClause,null);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.POLISH_COLUMN_NAME, reallyLearnedWords.get(i));
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_IS_LEARNED, 1);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_IS_LEARNED_COUNTER, 1);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_REVIEW_DATE, changeDate(1,cal,dateFormat));
+                String whereClause = WordAccountStatusContract.WordAccountStatusColumnsEntry.CATEGORY_COLUMN_NAME + " = "  + "'" + categoryName+ "'"  + " AND " +
+                        WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_ACCOUNT_NAME + " = " + "'" + accountName +  "'" + " AND " +
+                        WordAccountStatusContract.WordAccountStatusColumnsEntry.POLISH_COLUMN_NAME +   " = " +  "'" + reallyLearnedWords.get(i) + "'";
+                WordAccountStatusContract.myIsLearnedDB.update(WordAccountStatusContract.WordAccountStatusColumnsEntry.TABLE_NAME,cv,whereClause,null);
                 cv.clear();
             }else if (WordAccountStatusContract.ifWordAccountStatusCursorContain(reallyLearnedWords.get(i),categoryName,accountName,1)){
-                Log.v("TAG", "Baza zawiera takie nauczone słowo: " + reallyLearnedWords.get(i));
                 learnedWordsByAccount = WordAccountStatusContract.getWordAccountStatusCursorWithSpecificAccountLearned(accountName);
                 int learnedCount = getSpecificLearnCounterWordByAccount(reallyLearnedWords.get(i),categoryName,learnedWordsByAccount);
-                changeDate(learnedCount+1);
-                Log.v("TAG", "Liczba nauczen slowa: " + learnedCount);
                 ContentValues cv = new ContentValues();
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, reallyLearnedWords.get(i));
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED, 1);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED_COUNTER, learnedCount + 1);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_REVIEW_DATE, localTime);
-                String whereClause = WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = "  + "'" + categoryName+ "'"  + " AND " +
-                        WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + " = " + "'" + accountName +  "'" + " AND " +
-                        WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME +   " = " +  "'" + reallyLearnedWords.get(i) + "'";
-                WordAccountStatusContract.myIsLearnedDB.update(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME,cv,whereClause,null);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.POLISH_COLUMN_NAME, reallyLearnedWords.get(i));
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_IS_LEARNED, 1);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_IS_LEARNED_COUNTER, learnedCount + 1);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_REVIEW_DATE, changeDate(learnedCount+1,cal,dateFormat));
+                String whereClause = WordAccountStatusContract.WordAccountStatusColumnsEntry.CATEGORY_COLUMN_NAME + " = "  + "'" + categoryName+ "'"  + " AND " +
+                        WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_ACCOUNT_NAME + " = " + "'" + accountName +  "'" + " AND " +
+                        WordAccountStatusContract.WordAccountStatusColumnsEntry.POLISH_COLUMN_NAME +   " = " +  "'" + reallyLearnedWords.get(i) + "'";
+                WordAccountStatusContract.myIsLearnedDB.update(WordAccountStatusContract.WordAccountStatusColumnsEntry.TABLE_NAME,cv,whereClause,null);
                 cv.clear();
                 learnedWordsByAccount.close();
             }else if ((!WordAccountStatusContract.ifWordAccountStatusCursorContain(reallyLearnedWords.get(i),categoryName,accountName,1)) ||
             (!WordAccountStatusContract.ifWordAccountStatusCursorContain(reallyLearnedWords.get(i),categoryName,accountName,0))) {
-                Log.v("TAG", "Baza nie zawiera takiego słowa, dodajemy jako nauczone: " + reallyLearnedWords.get(i));
-                changeDate(1);
                 ContentValues cv = new ContentValues();
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME, reallyLearnedWords.get(i));
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED, 1);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_IS_LEARNED_COUNTER, 1);
-                cv.put(WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_REVIEW_DATE, localTime);
-                WordAccountStatusContract.myIsLearnedDB.insert(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME, null, cv);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.POLISH_COLUMN_NAME, reallyLearnedWords.get(i));
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_ACCOUNT_NAME, accountName);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_IS_LEARNED, 1);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_IS_LEARNED_COUNTER, 1);
+                cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_REVIEW_DATE, changeDate(1,cal,dateFormat));
+                WordAccountStatusContract.myIsLearnedDB.insert(WordAccountStatusContract.WordAccountStatusColumnsEntry.TABLE_NAME, null, cv);
                 cv.clear();
             }
         }
@@ -421,13 +414,6 @@ public class LearningSummaryActivity extends AppCompatActivity {
                    reallyLearnedCategories.add(learnedWordsCategory.get(i));
                }
             }
-        }
-
-        for(int i=0;i<reallyLearnedWords.size();i++){
-            Log.v("TAG", "reallyLearnedWords: " + reallyLearnedWords.get(i));
-        }
-        for(int i=0;i<reallyLearnedCategories.size();i++){
-            Log.v("TAG", "reallyLearnedCategories: " + reallyLearnedCategories.get(i));
         }
     }
 

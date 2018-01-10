@@ -61,8 +61,6 @@ public class LearningToGermanActivity extends AppCompatActivity {
         nextQuestionBTN = (Button)findViewById(R.id.nextQuestionBTN);
         nextQuestionBTN.setVisibility(View.INVISIBLE);
         currentQuestion = 1;
-
-        //getting data from intent
         Intent intent = getIntent();
         germanWordsInCategory = intent.getStringArrayListExtra("german_words");
         polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
@@ -71,16 +69,12 @@ public class LearningToGermanActivity extends AppCompatActivity {
         learnedWordsCategory = intent.getStringArrayListExtra("learned_words_category");
         missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
         accountName = intent.getStringExtra("account_name");
-        //categoryName = intent.getStringExtra("category_name");
         categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
-        //////////////////////////////
 
         long seed = System.nanoTime();
         Collections.shuffle(germanWordsInCategory, new Random(seed));
         Collections.shuffle(polishWordsInCategory, new Random(seed));
         Collections.shuffle(categoriesOfWordsToReview, new Random(seed));
-        //categoryName = intent.getStringExtra("category_name");
-        //selectedCategoryTV.setText(categoryName);
         questionCount = germanWordsInCategory.size();
         wordAccountStatusCursor = WordAccountStatusContract.getWordAccountStatusCursor();
         questionCore(questionCount, currentQuestion);
@@ -163,9 +157,7 @@ public class LearningToGermanActivity extends AppCompatActivity {
         myIntent.putStringArrayListExtra("learned_words_category",learnedWordsCategory);
         myIntent.putStringArrayListExtra("missed_words_category",missedWordsCategory);
         myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
-        //myIntent.putExtra("category_name",categoryName);
         myIntent.putExtra("account_name",accountName);
-        Log.v("TAG", "Account Name: " + accountName+ " --- Selected Category: " + categoryName);
         startActivityForResult(myIntent,1);
     }
 }

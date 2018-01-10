@@ -16,7 +16,7 @@ public class AccountListContract{
     public static AccountListAdapter mAdapter;
     public static final String sharedName = "name";
 
-    public static final class AccountListEntry implements BaseColumns {
+    public static final class AccountListColumnsEntry implements BaseColumns {
 
         public static final String TABLE_NAME = "accounts";
         public static final String COLUMN_ACCOUNT_NAME = "name";
@@ -24,7 +24,7 @@ public class AccountListContract{
 
     public static Cursor getAccountCursor(){
         return accountDB.query
-                (AccountListEntry.TABLE_NAME,
+                (AccountListColumnsEntry.TABLE_NAME,
                         null,
                         null,
                         null,

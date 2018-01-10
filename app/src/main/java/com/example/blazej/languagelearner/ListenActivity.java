@@ -5,13 +5,10 @@ import android.graphics.Color;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -88,7 +85,6 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
         myButtonList.add(ans4BTN);
         currentQuestion = 1;
 
-        //getting data from intent
         Intent intent = getIntent();
         germanWordsInCategory = intent.getStringArrayListExtra("german_words");
         polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
@@ -99,15 +95,12 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
         missedWordsCategory = intent.getStringArrayListExtra("missed_words_category");
         accountName = intent.getStringExtra("account_name");
         categoryName = intent.getStringExtra("category_name");
-        //////////////////////////////
 
         long seed = System.nanoTime();
         Collections.shuffle(germanWordsInCategory, new Random(seed));
         Collections.shuffle(polishWordsInCategory, new Random(seed));
         Collections.shuffle(categoriesOfWordsToReview, new Random(seed));
-        //selectedCategoryTV.setText(categoryName);
         questionCount = germanWordsInCategory.size();
-
         questionCore(questionCount,currentQuestion);
     }
 
@@ -133,11 +126,8 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
             int index = currentQuestion - 1;
             categoryName = categoriesOfWordsToReview.get(index);
             selectedCategoryTV.setText(getString(R.string.chosen_category,categoryName));
-            // To co mamy przetlumaczyć
             germanWord = germanWordsInCategory.get(index);
-            // Dobra odpowiedz
             rightAnswer = polishWordsInCategory.get(index);
-            //toLearnWordTV.setText(germanWord);
             int buttonIndexWithGoodAns = randInt(0,3);
             goodAnsIndex = buttonIndexWithGoodAns;
             myButtonList.get(buttonIndexWithGoodAns).setText(rightAnswer);
@@ -145,7 +135,6 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
             int[] array2 = new int[3];
             switch(buttonIndexWithGoodAns){
                 case 0:
-                    Log.v("TAG", "Case 0");
                     Random rnd = new Random();
                     int badAns1 = getRandomWithExclusion(rnd,0,questionCount-1,index);
                     array1[0] = index;
@@ -157,14 +146,12 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
                     array2[2] = badAns2;
                     Arrays.sort(array2);
                     int badAns3 = getRandomWithExclusion(rnd,0,questionCount-1,array2[0],array2[1],array2[2]);
-                    Log.v("TAG","index: " + index + "\nbadAns1: " + badAns1 + "\nbadAns2: " + badAns2 + "\nbadAns3: " + badAns3);
                     myButtonList.get(1).setText(polishWordsInCategory.get(badAns1));
                     myButtonList.get(2).setText(polishWordsInCategory.get(badAns2));
                     myButtonList.get(3).setText(polishWordsInCategory.get(badAns3));
                     break;
 
                 case 1:
-                    Log.v("TAG", "Case 1");
                     rnd = new Random();
                     badAns1 = getRandomWithExclusion(rnd,0,questionCount-1,index);
                     array1[0] = index;
@@ -176,13 +163,11 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
                     array2[2] = badAns2;
                     Arrays.sort(array2);
                     badAns3 = getRandomWithExclusion(rnd,0,questionCount-1,array2[0],array2[1],array2[2]);
-                    Log.v("TAG","index: " + index + "\nbadAns1: " + badAns1 + "\nbadAns2: " + badAns2 + "\nbadAns3: " + badAns3);
                     myButtonList.get(0).setText(polishWordsInCategory.get(badAns1));
                     myButtonList.get(2).setText(polishWordsInCategory.get(badAns2));
                     myButtonList.get(3).setText(polishWordsInCategory.get(badAns3));
                     break;
                 case 2:
-                    Log.v("TAG", "Case 2");
                     rnd = new Random();
                     badAns1 = getRandomWithExclusion(rnd,0,questionCount-1,index);
                     array1[0] = index;
@@ -194,13 +179,11 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
                     array2[2] = badAns2;
                     Arrays.sort(array2);
                     badAns3 = getRandomWithExclusion(rnd,0,questionCount-1,array2[0],array2[1],array2[2]);
-                    Log.v("TAG","index: " + index + "\nbadAns1: " + badAns1 + "\nbadAns2: " + badAns2 + "\nbadAns3: " + badAns3);
                     myButtonList.get(0).setText(polishWordsInCategory.get(badAns1));
                     myButtonList.get(1).setText(polishWordsInCategory.get(badAns2));
                     myButtonList.get(3).setText(polishWordsInCategory.get(badAns3));
                     break;
                 case 3:
-                    Log.v("TAG", "Case 3");
                     rnd = new Random();
                     badAns1 = getRandomWithExclusion(rnd,0,questionCount-1,index);
                     array1[0] = index;
@@ -212,12 +195,10 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
                     array2[2] = badAns2;
                     Arrays.sort(array2);
                     badAns3 = getRandomWithExclusion(rnd,0,questionCount-1,array2[0],array2[1],array2[2]);
-                    Log.v("TAG","index: " + index + "\nbadAns1: " + badAns1 + "\nbadAns2: " + badAns2 + "\nbadAns3: " + badAns3);
                     myButtonList.get(0).setText(polishWordsInCategory.get(badAns1));
                     myButtonList.get(1).setText(polishWordsInCategory.get(badAns2));
                     myButtonList.get(2).setText(polishWordsInCategory.get(badAns3));
                     break;
-
             }
         }else{
             showResult();
@@ -227,7 +208,6 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
     private int randInt(int min, int max) {
         Random rand = new Random();
         int randomNum = rand.nextInt((max - min) + 1) + min;
-        Log.v("TAG", "randomNum (bez witout): " + randomNum);
         return randomNum;
     }
 
@@ -251,9 +231,7 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
         myIntent.putStringArrayListExtra("learned_words_category",learnedWordsCategory);
         myIntent.putStringArrayListExtra("missed_words_category",missedWordsCategory);
         myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
-        //myIntent.putExtra("category_name",categoryName);
         myIntent.putExtra("account_name",accountName);
-        Log.v("TAG", "Account Name: " + accountName + " --- Selected Category: " + categoryName);
         startActivityForResult(myIntent,1);
     }
 
@@ -318,7 +296,6 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
                 rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 break;
             default:
-                Log.v("TAG", "Zaden z przycisków");
                 break;
         }
         rightAnswerTV.startAnimation(fadeIn);

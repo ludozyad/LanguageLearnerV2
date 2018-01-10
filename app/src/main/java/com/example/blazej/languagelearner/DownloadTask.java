@@ -18,17 +18,13 @@ import java.util.LinkedHashMap;
  * Created by Blazej on 19.10.2017.
  */
 
-public class DownloadTask {
-    // url = WordListContract.wordListUrl
-    // htmlContent = WordListContract.categoriesHtmlPlace
-    // baseSiteUrl = WordListContract.baseSiteUll
-    // wordsTables = WordListContract.wordsTables
-    public static ArrayList<String> downloadHeadingName(String url, String htmlContent){
+class DownloadTask {
+    static ArrayList<String> downloadHeadingName(String url, String htmlContent){
         Document doc = null;
         try {
             doc = Jsoup.connect(url).get();
         } catch (IOException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
         Elements links;
         if (doc != null) {
@@ -38,17 +34,16 @@ public class DownloadTask {
         }
         String allTitlesString = links.html();
         String[] myArray = allTitlesString.split("\n");
-
         return new ArrayList<>(Arrays.asList(myArray));
     }
 
-    public static ArrayList<LinkedHashMap<String,String>> downloadAllWords(String url, String htmlContent, String baseSiteUrl, String wordsTables){
+    static ArrayList<LinkedHashMap<String,String>> downloadAllWords(String url, String htmlContent, String baseSiteUrl, String wordsTables){
         ArrayList<LinkedHashMap<String,String>> finalList = new ArrayList<>();
         Document doc = null;
         try {
             doc = Jsoup.connect(url).get();
         } catch (IOException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
 
         Elements links = null;
@@ -68,7 +63,7 @@ public class DownloadTask {
             try {
                 tempDoc = Jsoup.connect(linksList.get(i)).get();
             } catch (IOException e) {
-                //e.printStackTrace();
+                e.printStackTrace();
             }
 
             Elements words;

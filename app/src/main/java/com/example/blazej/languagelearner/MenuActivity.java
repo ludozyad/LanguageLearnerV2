@@ -1,11 +1,12 @@
 package com.example.blazej.languagelearner;
 
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -15,35 +16,29 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.blazej.languagelearner.data.AccountListContract;
-import com.example.blazej.languagelearner.data.WordAccountStatusContract;
-import com.example.blazej.languagelearner.data.WordAccountStatusDbHelper;
 import com.example.blazej.languagelearner.data.WordListContract;
 import com.example.blazej.languagelearner.data.WordsDbHelper;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-
 public class MenuActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    /* A constant to save and restore the Cursor that is being displayed */
+
     private static final String TAG = "MenuActivity";
     private static final int LOADER_ID = 1;
     private Button newContentBTN;
+    private Button statisticBTN;
     private Button reviewContentBTN;
     private Button learnGrammarBTN;
     private Button retryBTN;
     private TextView pleaseWaitTV;
-
-    //private SQLiteDatabase myWordsDB;
     private ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+        statisticBTN = (Button)findViewById(R.id.checkStatisticsBTN);
         newContentBTN = (Button)findViewById(R.id.newContentBTN);
         reviewContentBTN = (Button)findViewById(R.id.reviewContentBTN);
         learnGrammarBTN = (Button)findViewById(R.id.learnGrammarBTN);
@@ -52,6 +47,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
         newContentBTN.setVisibility(View.INVISIBLE);
         reviewContentBTN.setVisibility(View.INVISIBLE);
         learnGrammarBTN.setVisibility(View.INVISIBLE);
+        statisticBTN.setVisibility(View.INVISIBLE);
         retryBTN.setVisibility(View.INVISIBLE);
         pleaseWaitTV.setVisibility(View.INVISIBLE);
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
@@ -65,6 +61,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
                onClickRestart();
             }
         });
+
     }
     public void onClickRestart(){
         getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
@@ -126,6 +123,7 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
             newContentBTN.setVisibility(View.VISIBLE);
             reviewContentBTN.setVisibility(View.VISIBLE);
             learnGrammarBTN.setVisibility(View.VISIBLE);
+            statisticBTN.setVisibility(View.VISIBLE);
             retryBTN.setVisibility(View.INVISIBLE);
         }else{
             Toast.makeText(this,"Brak połączenia z internetem",Toast.LENGTH_SHORT).show();
@@ -152,4 +150,29 @@ public class MenuActivity extends AppCompatActivity implements LoaderManager.Loa
         Intent intent = new Intent(this, ChooseGrammarCategoryActivity.class);
         startActivity(intent);
     }
+
+    public void onStatisticView(View view) {
+        Intent intent = new Intent(this, StatisticsActivity.class);
+        startActivity(intent);
+    }
+
+    public void showAppInfo(View view) {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
+        builder.setTitle("Informacje o aplikacji")
+                .setMessage(R.string.about)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
+    }
+
 }

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
@@ -21,13 +20,9 @@ import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.blazej.languagelearner.data.AccountListContract;
 import com.example.blazej.languagelearner.data.WordAccountStatusContract;
-import com.example.blazej.languagelearner.data.WordAccountStatusDbHelper;
 import com.example.blazej.languagelearner.data.WordListContract;
-import com.example.blazej.languagelearner.data.WordsDbHelper;
-
 import java.util.ArrayList;
 
 public class ChooseCategoryActivity extends AppCompatActivity {
@@ -91,8 +86,6 @@ public class ChooseCategoryActivity extends AppCompatActivity {
             }
         };
         categoriesListView.setAdapter(adapter);
-
-        //categoriesListView.setAdapter(adapter);
         categoriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -177,16 +170,11 @@ public class ChooseCategoryActivity extends AppCompatActivity {
         }
 
         Cursor allLearnedWordsInThisAccount = WordListContract.getAllWordsByArray(polishWordsLearnedArray, categoriesOfLearnedWordsArray); // tu zjebane cos
-        //Log.v("TAG","allLearnedWordsInThisAccount size: " + allLearnedWordsInThisAccount.getCount());
         if (allLearnedWordsInThisAccount != null) {
             while (allLearnedWordsInThisAccount.moveToNext()) {
                 germanWordsLearnedArrayList.add(allLearnedWordsInThisAccount.getString(1));
             }
         }
-
-        //  here we have array lists of learned words
-        //  polishWordsLearnedArrayList
-        //  germanWordsLearnedArrayList
 
         Cursor wordsInCategory = WordListContract.getWordsInCategory(categoryName);
         while (wordsInCategory.moveToNext()) {
@@ -194,21 +182,10 @@ public class ChooseCategoryActivity extends AppCompatActivity {
             allPolishWordsInCategoryArrayList.add(wordsInCategory.getString(1));
         }
 
-        // here we have all words in categories and learned words
-
         allGermanWordsInCategoryArrayList.removeAll(germanWordsLearnedArrayList);
         allPolishWordsInCategoryArrayList.removeAll(polishWordsLearnedArrayList);
         germanWordsToLearnArray = allGermanWordsInCategoryArrayList;
         polishWordsToLearnArray = allPolishWordsInCategoryArrayList;
-
-        Log.v("TAG","germanWordsToLearnArray.size(): " + germanWordsToLearnArray.size() + "polishWordsToLearnArray.size(): " + polishWordsToLearnArray.size());
-
-        for(int i = 0;i<germanWordsToLearnArray.size(); i++){
-            Log.v("TAG", "germanWordsToLearnArray: " + germanWordsToLearnArray.get(i));
-        }
-        for(int i = 0;i<polishWordsToLearnArray.size(); i++){
-            Log.v("TAG", "polishWordsToLearnArray: " + polishWordsToLearnArray.get(i));
-        }
 
         int wordsToLearn = wordsInCategory.getCount() - polishLearnedWordsCursor.getCount();
         for (int i = 0; i < wordsToLearn; i++) {
@@ -224,10 +201,7 @@ public class ChooseCategoryActivity extends AppCompatActivity {
         }else{
             selectedCategoryCount=0;
         }
-        //if (selectedCategoryCount < 4) {
-        //    Toast.makeText(this, "Za mało słów do nauki, wybierz inną kategorię.", Toast.LENGTH_SHORT).show();
-        //}
-        //else
+
         if(selectedCategoryCount > 0 && selectedCategoryCount <= germanWordsToLearnArray.size()){
             Intent myIntent = new Intent(getApplicationContext(), LearningToPolishActivity.class);
             myIntent.putExtra("category_name", categoryName);
@@ -235,7 +209,6 @@ public class ChooseCategoryActivity extends AppCompatActivity {
             myIntent.putStringArrayListExtra("german_words", germanWordsToLearnArray);
             myIntent.putStringArrayListExtra("polish_words", polishWordsToLearnArray);
             myIntent.putStringArrayListExtra("word_category", categoriesOfWordsArrayList);
-            Log.v("TAG", "germanWordsToLearnArray: " + germanWordsToLearnArray.size() + " polishWordsToLearnArray: " + polishWordsToLearnArray.size() + " categoriesOfWordsArrayList.size(): " + categoriesOfWordsArrayList.size());
             startActivityForResult(myIntent, 1);
         } else if(selectedCategoryCount > germanWordsToLearnArray.size()){
             Toast.makeText(this,"Wprowadź cyfre z zakresu 1 do " + germanWordsToLearnArray.size(),Toast.LENGTH_SHORT).show();

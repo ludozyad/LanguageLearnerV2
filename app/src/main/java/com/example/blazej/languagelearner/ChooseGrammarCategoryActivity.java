@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -24,7 +23,7 @@ public class ChooseGrammarCategoryActivity extends AppCompatActivity {
     String[] categoriesArrayList;
     String categoryName;
     ArrayList<Integer> tempArrayListOfResources = new ArrayList<>();
-    int [] categoriesCountArray;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +65,6 @@ public class ChooseGrammarCategoryActivity extends AppCompatActivity {
             }
         });
     }
-
 
     String[] mResources = {
             "g1.png",

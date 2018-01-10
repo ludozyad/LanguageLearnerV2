@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
@@ -40,6 +41,7 @@ public class ReviewActivity extends AppCompatActivity {
     ArrayList<String> polishWordsByAccount = new ArrayList<>();
     ArrayList<String> categoriesOfWordsToReview = new ArrayList<>();
     Button startReviewBTN;
+    EditText pickNumberET2;
     ArrayList<String> categoriesOfWords = new ArrayList<>();
     DateFormat dateFormat;
     String localTime;
@@ -65,13 +67,19 @@ public class ReviewActivity extends AppCompatActivity {
         localTime = dateFormat.format(currentLocalTime);
         startReviewBTN = (Button)findViewById(R.id.startReviewBTN);
         reviewCursor = WordAccountStatusContract.getWordAccountStatusCursorWithSpecificAccount(accountName);
-
+        pickNumberET2 = (EditText)findViewById(R.id.pickNumberET2);
+        pickNumberET2.setVisibility(View.INVISIBLE);
         if(reviewCursor == null) {
             Log.v("TAG", "reviewCursor jest nullem");
         }else{
             Log.v("TAG", "reviewCursor count: " + reviewCursor.getCount());
         }
         if(reviewCursor.getCount() > 0) {
+            if(reviewCursor.getCount() < 6){
+                Toast.makeText(this,"Wprowadź cyfre z zakresu 1 do " + reviewCursor.getCount(),Toast.LENGTH_SHORT).show();
+                numberPicker.setVisibility(View.INVISIBLE);
+                pickNumberET2.setVisibility(View.VISIBLE);
+            }
             String[] wordsToReviewArray;
             String[] categoriesOfWordsToReviewArray;
 
@@ -82,8 +90,8 @@ public class ReviewActivity extends AppCompatActivity {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    if(date.before(currentLocalTime) || date.equals(currentLocalTime)){
-                           // date.equals(currentLocalTime) || date.before(currentLocalTime)) {
+                    // Nie zapomniec zmienic na before
+                    if(date.after(currentLocalTime) || date.equals(currentLocalTime)){
                         Log.v("TAG","Slowo: " + reviewCursor.getString(1));
                         Log.v("TAG","Data powtorki: " + reviewCursor.getString(6));
                         Log.v("TAG","Dzisiejsza Data: " + localTime);
@@ -97,32 +105,16 @@ public class ReviewActivity extends AppCompatActivity {
                 wordsToReviewArray = wordsToReview.toArray(new String[wordsToReview.size()]);
                 categoriesOfWordsToReviewArray = categoriesOfWordsToReview.toArray(new String[categoriesOfWordsToReview.size()]);
 
-       //     } else {
-       //         Log.v("TAG", "reviewCursor pusty!!");
-       //     }
-
-            for (int i = 0; i < categoriesOfWordsToReview.size(); i++) {
-                Log.v("TAG", "categoriesOfWordsToReview: " + categoriesOfWordsToReview.get(i));
-            }
-
             Cursor wordsToReviewCursor = WordListContract.getAllWordsByArray(wordsToReviewArray, categoriesOfWordsToReviewArray);
-
-
             categoriesOfWords = new ArrayList<>();
             if(wordsToReviewCursor!=null) {
                 if (wordsToReviewCursor.getCount() > 0) {
                     while (wordsToReviewCursor.moveToNext()) {
-                        Log.v("TAG", "0: " + wordsToReviewCursor.getString(0));
-                        Log.v("TAG", "1: " + wordsToReviewCursor.getString(1));
-                        Log.v("TAG", "2: " + wordsToReviewCursor.getString(2));
-                        Log.v("TAG", "3: " + wordsToReviewCursor.getString(3));
-                        Log.v("TAG", "4: " + wordsToReviewCursor.getString(4));
                         germanWordsByAccount.add(wordsToReviewCursor.getString(1));
                         polishWordsByAccount.add(wordsToReviewCursor.getString(2));
                         categoriesOfWords.add(wordsToReviewCursor.getString(3));
                     }
                 } else {
-                    Log.v("TAG", "Nie ma słów do powtórki!");
                     numberPicker.setVisibility(View.INVISIBLE);
                     startReviewBTN.setVisibility(View.INVISIBLE);
                     Toast.makeText(this,"Niewystarczająca ilość słów do powtórki!",Toast.LENGTH_SHORT).show();
@@ -133,7 +125,6 @@ public class ReviewActivity extends AppCompatActivity {
                 startReviewBTN.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,"Niewystarczająca ilość słów do powtórki!",Toast.LENGTH_SHORT).show();
             }
-            //
             numberPicker.setMinValue(1);
             numberPicker.setMaxValue(wordsToReview.size());
         }else{
@@ -161,19 +152,29 @@ public class ReviewActivity extends AppCompatActivity {
     }
 
     public void onStartReview(View view) {
-        wordsToReviewCount = numberPicker.getValue();
-        Intent myIntent = new Intent(getApplicationContext(), LearningToPolishActivity.class);
-        if(reviewCursor.getCount() > 0){
-            for(int i = 0 ; i < categoriesOfWordsToReview.size(); i++){
-                Log.v("TAG","categoriesOfWordsToReview: " + categoriesOfWordsToReview.get(i));
-            }
-            myIntent.putStringArrayListExtra("german_words",germanWordsByAccount);
-            myIntent.putStringArrayListExtra("polish_words",polishWordsByAccount);
-            myIntent.putStringArrayListExtra("word_category",categoriesOfWords);
-            myIntent.putExtra("words_to_review_count",wordsToReviewCount);
-            startActivityForResult(myIntent,1);
+        if(reviewCursor.getCount() > 5){
+            wordsToReviewCount = numberPicker.getValue();
         }else{
-            Toast.makeText(this,"Niewystarczająca ilość słów do powtórki!",Toast.LENGTH_SHORT).show();
+            if(!pickNumberET2.getText().toString().equals("")) {
+                wordsToReviewCount = Integer.parseInt(pickNumberET2.getText().toString());
+            }else{
+                Toast.makeText(this,"Wprowadź cyfre z zakresu 1 do " + reviewCursor.getCount(),Toast.LENGTH_SHORT).show();
+            }
+        }
+        if((wordsToReviewCount <= reviewCursor.getCount()) && wordsToReviewCount!=0) {
+            Intent myIntent = new Intent(getApplicationContext(), LearningToPolishActivity.class);
+            if (reviewCursor.getCount() > 0) {
+                myIntent.putStringArrayListExtra("german_words", germanWordsByAccount);
+                myIntent.putStringArrayListExtra("polish_words", polishWordsByAccount);
+                myIntent.putStringArrayListExtra("word_category", categoriesOfWords);
+                myIntent.putExtra("words_to_review_count", wordsToReviewCount);
+                startActivityForResult(myIntent, 1);
+            } else {
+                Toast.makeText(this, "Niewystarczająca ilość słów do powtórki!", Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            Toast.makeText(this,"Wprowadź cyfre z zakresu 1 do " + reviewCursor.getCount(),Toast.LENGTH_SHORT).show();
+            pickNumberET2.setText("");
         }
     }
 

@@ -3,11 +3,8 @@ package com.example.blazej.languagelearner.data;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
-import android.util.Log;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 /**
  * Created by Blazej on 13.10.2017.
@@ -22,7 +19,7 @@ public class WordListContract {
     public static SQLiteDatabase myWordsDB;
 
 
-    public static final class DatabaseColumnsEntry implements BaseColumns {
+    public static final class WordListColumnsEntry implements BaseColumns {
         public static final String TABLE_NAME = "words";
         public static final String GERMAN_COLUMN_NAME = "german_column";
         public static final String POLISH_COLUMN_NAME = "polish_column";
@@ -32,85 +29,60 @@ public class WordListContract {
 
     public static Cursor getAllWordsTableCursor() {
         return myWordsDB.query(
-                WordListContract.DatabaseColumnsEntry.TABLE_NAME,
+                WordListContract.WordListColumnsEntry.TABLE_NAME,
                 null,
                 null,
                 null,
                 null,
                 null,
-                WordListContract.DatabaseColumnsEntry._ID
+                WordListContract.WordListColumnsEntry._ID
         );
     }
 
     public static Cursor getAllCategories(){
         return myWordsDB.query(
-                WordListContract.DatabaseColumnsEntry.TABLE_NAME,
-                new String[] {WordListContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME},
+                WordListContract.WordListColumnsEntry.TABLE_NAME,
+                new String[] {WordListContract.WordListColumnsEntry.CATEGORY_COLUMN_NAME},
                 null,
                 null,
-                WordListContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME,
+                WordListContract.WordListColumnsEntry.CATEGORY_COLUMN_NAME,
                 null,
-                WordListContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME
+                WordListContract.WordListColumnsEntry.CATEGORY_COLUMN_NAME
         );
     }
 
     public static Cursor getWordsInCategory(String category){
-        return  myWordsDB.query(WordListContract.DatabaseColumnsEntry.TABLE_NAME,
-                new String[] {WordListContract.DatabaseColumnsEntry.GERMAN_COLUMN_NAME,WordListContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME},
-                WordListContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = ?",
+        return  myWordsDB.query(WordListContract.WordListColumnsEntry.TABLE_NAME,
+                new String[] {WordListContract.WordListColumnsEntry.GERMAN_COLUMN_NAME,WordListContract.WordListColumnsEntry.POLISH_COLUMN_NAME},
+                WordListContract.WordListColumnsEntry.CATEGORY_COLUMN_NAME + " = ?",
                 new String[]{category},
                 null,
                 null,
                 null);
     }
 
-    public static int getCategoryCount(String category){
-        Cursor myCursor = myWordsDB.query(
-                WordListContract.DatabaseColumnsEntry.TABLE_NAME,
-                new String[] {WordListContract.DatabaseColumnsEntry.CATEGORY_COUNT_COLUMN_NAME},
-                WordListContract.DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + "=?",
-                new String[] {category},
-                null,
-                null,
-                null,
-                "1"
-        );
-        myCursor.moveToFirst();
-        int catCount = myCursor.getInt(0);
-        myCursor.close();
-        return catCount;
-    }
-
     public static Cursor getAllWordsByArray(String[] wordList, String[] categoryNames){
-
         String[] wordListAndCategoryNames = joinArrayGeneric(wordList,categoryNames);
-        Log.v("TAG", "wordListAndCategoryNames: " + wordListAndCategoryNames.length);
-
         String whereClause = "( ";
         if(wordList.length > 0) {
             for (int i = 0; i < wordList.length; i++) {
                if (i == wordList.length - 1) {
-                    whereClause += WordListContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME + " = ?";
+                    whereClause += WordListContract.WordListColumnsEntry.POLISH_COLUMN_NAME + " = ?";
                 } else {
-                    whereClause += WordListContract.DatabaseColumnsEntry.POLISH_COLUMN_NAME + " = ?" + " OR ";
+                    whereClause += WordListContract.WordListColumnsEntry.POLISH_COLUMN_NAME + " = ?" + " OR ";
                 }
             }
             whereClause += ") AND (";
             for (int j = 0; j < wordList.length; j++) {
                 if (j == wordList.length - 1) {
-                    whereClause += DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = ?";
+                    whereClause += WordListColumnsEntry.CATEGORY_COLUMN_NAME + " = ?";
                 } else {
-                    whereClause += DatabaseColumnsEntry.CATEGORY_COLUMN_NAME + " = ?" + " OR ";
+                    whereClause += WordListColumnsEntry.CATEGORY_COLUMN_NAME + " = ?" + " OR ";
                 }
             }
             whereClause += " )";
-
-            Log.v("TAG", "where Clause: " + whereClause);
-            for(int k = 0; k<wordListAndCategoryNames.length;k++){
-                Log.v("TAG","wordListAndCategoryNames: " + wordListAndCategoryNames[k]);
-            }
             return myWordsDB.query(
-                    WordListContract.DatabaseColumnsEntry.TABLE_NAME,
+                    WordListContract.WordListColumnsEntry.TABLE_NAME,
                     null,
                     whereClause,
                     wordListAndCategoryNames,
@@ -128,8 +100,6 @@ public class WordListContract {
         for (T[] array : arrays) {
             length += array.length;
         }
-
-        //T[] result = new T[length];
         final T[] result = (T[]) Array.newInstance(arrays[0].getClass().getComponentType(), length);
 
         int offset = 0;
@@ -137,7 +107,6 @@ public class WordListContract {
             System.arraycopy(array, 0, result, offset, array.length);
             offset += array.length;
         }
-
         return result;
     }
 }

@@ -12,8 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.blazej.languagelearner.R;import com.example.blazej.languagelearner.data.AccountListContract;
+import com.example.blazej.languagelearner.data.AccountListContract;
 import com.example.blazej.languagelearner.data.WordAccountStatusContract;
 
 /**
@@ -29,9 +28,7 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
         void onItemLongClick(int position, View v);
     }
 
-    private static final String TAG = "MyActivity";
     private static ClickListener clickListener;
-    // Holds on to the cursor to display accounts
     private Cursor mCursor;
     private Context mContext;
 
@@ -56,9 +53,9 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
         if (!mCursor.moveToPosition(position))
             return; // bail if returned null
         // Update the view holder with the information needed to display
-        String name = mCursor.getString(mCursor.getColumnIndex(AccountListContract.AccountListEntry.COLUMN_ACCOUNT_NAME));
+        String name = mCursor.getString(mCursor.getColumnIndex(AccountListContract.AccountListColumnsEntry.COLUMN_ACCOUNT_NAME));
 
-        long id = mCursor.getLong(mCursor.getColumnIndex(AccountListContract.AccountListEntry._ID));
+        long id = mCursor.getLong(mCursor.getColumnIndex(AccountListContract.AccountListColumnsEntry._ID));
         // Display the guest name
 
         holder.itemView.setOnTouchListener((new View.OnTouchListener() {
@@ -79,18 +76,15 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
     }
 
     public void swapCursor(Cursor newCursor) {
-        // Always close the previous mCursor first
         if (mCursor != null) mCursor.close();
         mCursor = newCursor;
         if (newCursor != null) {
-            // Force the RecyclerView to refresh
             this.notifyDataSetChanged();
         }
     }
 
     class AccountViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
 
-        // Will display account name
         TextView nameTextView;
 
         public AccountViewHolder(View itemView) {
@@ -131,13 +125,14 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
     }
 
     private void removeGuest(long id, String name) {
-         AccountListContract.accountDB.delete(AccountListContract.AccountListEntry.TABLE_NAME, AccountListContract.AccountListEntry._ID + "=" + id, null);
-         WordAccountStatusContract.myIsLearnedDB.delete(WordAccountStatusContract.DatabaseColumnsEntry.TABLE_NAME,WordAccountStatusContract.DatabaseColumnsEntry.COLUMN_ACCOUNT_NAME + "=" + name, null);
+         AccountListContract.accountDB.delete(AccountListContract.AccountListColumnsEntry.TABLE_NAME, AccountListContract.AccountListColumnsEntry._ID + "=" + id, null);
+         WordAccountStatusContract.myIsLearnedDB.delete(WordAccountStatusContract.WordAccountStatusColumnsEntry.TABLE_NAME,WordAccountStatusContract.WordAccountStatusColumnsEntry.COLUMN_ACCOUNT_NAME + "=" + name, null);
+         WordAccountStatusContract.myIsLearnedDB.delete(WordAccountStatusContract.WordStatisticColumnsEntry.TABLE_NAME,WordAccountStatusContract.WordStatisticColumnsEntry.COLUMN_ACCOUNT_NAME + "=" + name, null);
     }
 
     public static Cursor getAllGuests() {
         return AccountListContract.accountDB.query(
-                AccountListContract.AccountListEntry.TABLE_NAME,
+                AccountListContract.AccountListColumnsEntry.TABLE_NAME,
                 null,
                 null,
                 null,

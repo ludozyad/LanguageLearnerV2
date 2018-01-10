@@ -1,7 +1,5 @@
 package com.example.blazej.languagelearner;
 
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -16,24 +14,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.blazej.languagelearner.data.AccountListContract;
 import com.example.blazej.languagelearner.data.WordAccountStatusContract;
-import com.example.blazej.languagelearner.data.WordAccountStatusDbHelper;
-import com.example.blazej.languagelearner.data.WordListContract;
 import com.example.blazej.languagelearner.data.WordsDbHelper;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 public class LearningToPolishActivity extends AppCompatActivity {
     SharedPreferences sharedPref;
     String accountName;
     String callingActivity;
-    //public String selectedCategory = "category";
     TextView selectedCategoryTV;
     TextView whichQuestionTV;
     TextView toLearnWordTV;
@@ -57,15 +48,14 @@ public class LearningToPolishActivity extends AppCompatActivity {
     String categoryName;
     Cursor wordAccountStatusCursor;
 
-    AlphaAnimation fadeIn = new AlphaAnimation(0.0f , 1.0f ) ;
-    AlphaAnimation fadeOut = new AlphaAnimation( 1.0f , 0.0f ) ;
+    AlphaAnimation fadeIn = new AlphaAnimation(0.0f , 1.0f );
+    AlphaAnimation fadeOut = new AlphaAnimation( 1.0f , 0.0f );
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learning);
         sharedPref = getSharedPreferences(AccountListContract.sharedName,MODE_PRIVATE);
         accountName = sharedPref.getString(AccountListContract.sharedName,"XD");
-        Log.v("TAG","Imie w Learing to polish activity: " + accountName);
         selectedCategoryTV = (TextView)findViewById(R.id.selectedCategoryTV);
         whichQuestionTV = (TextView)findViewById(R.id.whichQuestionTV);
         toLearnWordTV = (TextView)findViewById(R.id.toLearnWordTV);
@@ -78,10 +68,6 @@ public class LearningToPolishActivity extends AppCompatActivity {
         nextQuestionBTN = (Button)findViewById(R.id.nextQuestionBTN);
         nextQuestionBTN.setVisibility(View.INVISIBLE);
 
-
-
-
-        /////////////
         Intent intent = getIntent();
         callingActivity = getCallingActivity().getClassName();
         switch (callingActivity){
@@ -89,20 +75,11 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 WordsDbHelper myDBHelper = new WordsDbHelper(this);
                 myDB = myDBHelper.getWritableDatabase();
                 wordAccountStatusCursor = WordAccountStatusContract.getWordAccountStatusCursor();
-                //categoryName = intent.getStringExtra("category_name");
                 selectedCategoryTV.setText(getString(R.string.chosen_category,categoryName));
                 questionCount = intent.getIntExtra("category_count",0);
                 germanWordsInCategory = intent.getStringArrayListExtra("german_words");
                 polishWordsInCategory = intent.getStringArrayListExtra("polish_words");
                 categoriesOfWordsToReview = intent.getStringArrayListExtra("word_category");
-                /*
-                Cursor wordsInCategory = getWordsInCategory(categoryName);
-                while(wordsInCategory.moveToNext()){
-                    germanWordsInCategory.add(wordsInCategory.getString(0));
-                    polishWordsInCategory.add(wordsInCategory.getString(1));
-                }
-                */
-                Log.v("TAG","questionCount: " + questionCount);
                 long seed = System.nanoTime();
                 Collections.shuffle(germanWordsInCategory, new Random(seed));
                 Collections.shuffle(polishWordsInCategory, new Random(seed));
@@ -110,7 +87,6 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 categoriesOfWordsToReview = new ArrayList<>(categoriesOfWordsToReview.subList(0,questionCount));
                 germanWordsInCategory = new ArrayList<>(germanWordsInCategory.subList(0,questionCount));
                 polishWordsInCategory = new ArrayList<>(polishWordsInCategory.subList(0,questionCount));
-                ///////////////////////////
                 break;
             case "com.example.blazej.languagelearner.ReviewActivity":
                 questionCount = intent.getIntExtra("words_to_review_count",0);
@@ -128,19 +104,10 @@ public class LearningToPolishActivity extends AppCompatActivity {
                 categoriesOfWordsToReview = new ArrayList<>(categoriesOfWordsToReview.subList(0,questionCount));
                 germanWordsInCategory = new ArrayList<>(germanWordsInCategory.subList(0,questionCount));
                 polishWordsInCategory = new ArrayList<>(polishWordsInCategory.subList(0,questionCount));
-
-                Log.v("TAG","TU WCHODZIMY DO LEARNINGTOPOLISH!@!@#@#");
-                for(int i=0;i<categoriesOfWordsToReview.size();i++){
-                    Log.v("TAG","categoriesOfWordsToReview: " + categoriesOfWordsToReview.get(i));
-                    Log.v("TAG","germanWordsInCategory: " + germanWordsInCategory.get(i));
-                    Log.v("TAG","polishWordsInCategory: " + polishWordsInCategory.get(i));
-                }
-                //categoryName = "";
                 break;
         }
         currentQuestion = 1;
         questionCore(questionCount, currentQuestion);
-
     }
 
     @Override
@@ -167,15 +134,12 @@ public class LearningToPolishActivity extends AppCompatActivity {
         yourAnswerTV.startAnimation(fadeOut);
         fadeOut.setDuration(800);
         fadeOut.setFillAfter(true);
-        //rightAnswerTV.setVisibility(View.INVISIBLE);
-        //yourAnswerTV.setVisibility(View.INVISIBLE);
         checkAnswerBTN.setVisibility(View.VISIBLE);
         enterWordET.setVisibility(View.VISIBLE);
         nextQuestionBTN.setVisibility(View.INVISIBLE);
         currentQuestion++;
         questionCore(questionCount, currentQuestion);
     }
-
 
     public void checkAnswerBTN(View view) {
         if(enterWordET.getText().length() > 0) {
@@ -192,14 +156,11 @@ public class LearningToPolishActivity extends AppCompatActivity {
             }else{
                 Toast.makeText(this, R.string.better_luck_next_time, Toast.LENGTH_SHORT).show();
                 yourAnswerTV.setText(getString(R.string.your_answer,yourAnswer));
-
                 rightAnswerTV.setText(getString(R.string.right_answer,rightAnswer));
                 missedWords.add(rightAnswer);
                 missedWordsCategory.add(categoriesOfWordsToReview.get(index));
                 yourAnswerTV.setTextColor(Color.WHITE);
             }
-            //rightAnswerTV.setVisibility(View.VISIBLE);
-            //yourAnswerTV.setVisibility(View.VISIBLE);
             rightAnswerTV.startAnimation(fadeIn);
             yourAnswerTV.startAnimation(fadeIn);
             fadeIn.setDuration(1200);
@@ -223,12 +184,8 @@ public class LearningToPolishActivity extends AppCompatActivity {
         myIntent.putStringArrayListExtra("missed_words",missedWords);
         myIntent.putStringArrayListExtra("learned_words_category",learnedWordsCategory);
         myIntent.putStringArrayListExtra("missed_words_category",missedWordsCategory);
-
         myIntent.putStringArrayListExtra("word_category",categoriesOfWordsToReview);
-
-        //myIntent.putExtra("category_name",categoryName);
         myIntent.putExtra("account_name",accountName);
-        Log.v("TAG", "Account Name: " + accountName+ " --- Selected Category: " + categoryName);
         startActivityForResult(myIntent,1);
     }
 }
