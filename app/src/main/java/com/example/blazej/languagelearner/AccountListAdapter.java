@@ -41,7 +41,6 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
 
     @Override
     public AccountViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // Get the RecyclerView item layout
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.account_list_item, parent, false);
         return new AccountViewHolder(view);
@@ -49,14 +48,11 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
 
     @Override
     public void onBindViewHolder(final AccountViewHolder holder, int position) {
-        // Move the mCursor to the position of the item to be displayed
         if (!mCursor.moveToPosition(position))
-            return; // bail if returned null
-        // Update the view holder with the information needed to display
+            return;
         String name = mCursor.getString(mCursor.getColumnIndex(AccountListContract.AccountListColumnsEntry.COLUMN_ACCOUNT_NAME));
 
         long id = mCursor.getLong(mCursor.getColumnIndex(AccountListContract.AccountListColumnsEntry._ID));
-        // Display the guest name
 
         holder.itemView.setOnTouchListener((new View.OnTouchListener() {
             @Override

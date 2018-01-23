@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.Button;
@@ -116,6 +117,7 @@ public class ListenActivity extends AppCompatActivity implements View.OnClickLis
             public void onClick(View v) {
                 String toSpeak = germanWord;
                 t1.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null,null);
+                Log.v("TAG","germanWord: " + germanWord);
             }
         };}
 

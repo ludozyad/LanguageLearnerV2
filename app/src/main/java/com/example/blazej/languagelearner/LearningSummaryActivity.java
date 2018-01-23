@@ -137,7 +137,22 @@ public class LearningSummaryActivity extends AppCompatActivity {
                     if(missedWords.size() > 0 || reallyLearnedWords.size() > 0) {
                         addWordsToDailyBase(missedWords, reallyLearnedWords);
                     }
-
+                    Cursor cursor1 = WordAccountStatusContract.getWordAccountStatusCursor();
+                    if(cursor1.getCount() > 0){
+                        while(cursor1.moveToNext()){
+                            Log.v("TAG", cursor1.getString(1) + " -- " + cursor1.getString(2) + " -- "  + cursor1.getString(3) + " -- "  + cursor1.getInt(4) + " -- "  + cursor1.getInt(5) + " -- "  + cursor1.getString(6));
+                        }
+                    }else{
+                        Log.v("TAG", "Kursor pusty");
+                    }
+                    Cursor cursor3 =  WordAccountStatusContract.getWordStatisticCursor();
+                    if(cursor3.getCount() > 0){
+                        while(cursor3.moveToNext()){
+                            Log.v("TAG", "Słowo: " + cursor3.getString(1) + " -- " + cursor3.getString(5));
+                        }
+                    }else{
+                        Log.v("TAG", "Kursor pusty");
+                    }
                 }
             break;
             case "com.example.blazej.languagelearner.ListenActivity":
@@ -176,10 +191,19 @@ public class LearningSummaryActivity extends AppCompatActivity {
                     addWordsToDailyBase(missedWords, reallyLearnedWords);
                 }
 
-                Cursor cursor = WordAccountStatusContract.getWordAccountStatusCursor();
-                if(cursor.getCount() > 0){
-                    while(cursor.moveToNext()){
-                        Log.v("TAG", cursor.getString(1) + " -- " + cursor.getString(2) + " -- "  + cursor.getString(3) + " -- "  + cursor.getInt(4) + " -- "  + cursor.getInt(5) + " -- "  + cursor.getString(6));
+                Cursor cursor2 = WordAccountStatusContract.getWordAccountStatusCursor();
+                if(cursor2.getCount() > 0){
+                    while(cursor2.moveToNext()){
+                        Log.v("TAG", cursor2.getString(1) + " -- " + cursor2.getString(2) + " -- "  + cursor2.getString(3) + " -- "  + cursor2.getInt(4) + " -- "  + cursor2.getInt(5) + " -- "  + cursor2.getString(6));
+                    }
+                }else{
+                    Log.v("TAG", "Kursor pusty");
+                }
+
+                Cursor cursor4 =  WordAccountStatusContract.getWordStatisticCursor();
+                if(cursor4.getCount() > 0){
+                    while(cursor4.moveToNext()){
+                        Log.v("TAG", "Słowo: " + cursor4.getString(1) + " -- " + cursor4.getString(5));
                     }
                 }else{
                     Log.v("TAG", "Kursor pusty");
@@ -327,7 +351,8 @@ public class LearningSummaryActivity extends AppCompatActivity {
             if (missedWordsCategory.size() > 0){
                 categoryName = missedWordsCategory.get(i);
             }
-            if (WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,1)) {
+            if ((WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,1)) ||
+            (WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,0))){
                 ContentValues cv = new ContentValues();
                 cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.POLISH_COLUMN_NAME, missedWords.get(i));
                 cv.put(WordAccountStatusContract.WordAccountStatusColumnsEntry.CATEGORY_COLUMN_NAME, categoryName);
@@ -340,8 +365,6 @@ public class LearningSummaryActivity extends AppCompatActivity {
                         WordAccountStatusContract.WordAccountStatusColumnsEntry.POLISH_COLUMN_NAME +   " = " +  "'" + missedWords.get(i) + "'";
                 WordAccountStatusContract.myIsLearnedDB.update(WordAccountStatusContract.WordAccountStatusColumnsEntry.TABLE_NAME,cv,whereClause,null);
                 cv.clear();
-            }else if (WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,0)){
-
             }else if ((!WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,1)) ||
                     (!WordAccountStatusContract.ifWordAccountStatusCursorContain(missedWords.get(i),categoryName,accountName,0))) {
                 ContentValues cv = new ContentValues();

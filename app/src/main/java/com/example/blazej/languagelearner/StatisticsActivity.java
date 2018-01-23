@@ -95,11 +95,6 @@ public class StatisticsActivity extends AppCompatActivity {
             allUnlearnedWords.add(allUnlearnedWordsCursor.getString(0));
         }
 
-
-        for(int i=0; i<allUnlearnedWords.size(); i++){
-            Log.v("TAG", "srara: " + allUnlearnedWords.get(i));
-        }
-
         String worstWord = "";
         Map<String, Integer> stringsCount = new HashMap<>();
         for(String s: allUnlearnedWords)
@@ -161,6 +156,10 @@ public class StatisticsActivity extends AppCompatActivity {
         }
 
         if(getAllDatesCursor.getCount() > 0) {
+            if(allBadAns.size() == 0){
+                worstWordTV.setVisibility(View.INVISIBLE);
+            }
+
             worstWordTV.setText(getString(R.string.your_worst_word, worstWord));
             BarGraphSeries<DataPoint> series = new BarGraphSeries<>();
             BarGraphSeries<DataPoint> series2 = new BarGraphSeries<>();

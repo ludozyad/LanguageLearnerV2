@@ -48,6 +48,7 @@ public class ReviewActivity extends AppCompatActivity {
     Date currentLocalTime;
     Calendar cal;
     int wordsToReviewCount = 0;
+    Cursor wordsToReviewCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,7 @@ public class ReviewActivity extends AppCompatActivity {
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
         localTime = dateFormat.format(currentLocalTime);
         startReviewBTN = (Button)findViewById(R.id.startReviewBTN);
+        startReviewBTN.setVisibility(View.INVISIBLE);
         reviewCursor = WordAccountStatusContract.getWordAccountStatusCursorWithSpecificAccount(accountName);
         pickNumberET2 = (EditText)findViewById(R.id.pickNumberET2);
         pickNumberET2.setVisibility(View.INVISIBLE);
@@ -75,11 +77,7 @@ public class ReviewActivity extends AppCompatActivity {
             Log.v("TAG", "reviewCursor count: " + reviewCursor.getCount());
         }
         if(reviewCursor.getCount() > 0) {
-            if(reviewCursor.getCount() < 6){
-                Toast.makeText(this,"Wprowadź cyfre z zakresu 1 do " + reviewCursor.getCount(),Toast.LENGTH_SHORT).show();
-                numberPicker.setVisibility(View.INVISIBLE);
-                pickNumberET2.setVisibility(View.VISIBLE);
-            }
+
             String[] wordsToReviewArray;
             String[] categoriesOfWordsToReviewArray;
 
@@ -90,8 +88,7 @@ public class ReviewActivity extends AppCompatActivity {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    // Nie zapomniec zmienic na before
-                    if(date.after(currentLocalTime) || date.equals(currentLocalTime)){
+                    if(date.before(currentLocalTime) || date.equals(currentLocalTime)){
                         Log.v("TAG","Slowo: " + reviewCursor.getString(1));
                         Log.v("TAG","Data powtorki: " + reviewCursor.getString(6));
                         Log.v("TAG","Dzisiejsza Data: " + localTime);
@@ -99,16 +96,29 @@ public class ReviewActivity extends AppCompatActivity {
                         categoriesOfWordsToReview.add(reviewCursor.getString(2));
                     }else{
                         Log.v("TAG", "Nie ma slow do powrotki!! (daty niezgodne)");
+                        Log.v("TAG","Slowo: " + reviewCursor.getString(1));
+                        Log.v("TAG","Data powtorki: " + reviewCursor.getString(6));
                     }
                 }
 
-                wordsToReviewArray = wordsToReview.toArray(new String[wordsToReview.size()]);
-                categoriesOfWordsToReviewArray = categoriesOfWordsToReview.toArray(new String[categoriesOfWordsToReview.size()]);
-
-            Cursor wordsToReviewCursor = WordListContract.getAllWordsByArray(wordsToReviewArray, categoriesOfWordsToReviewArray);
+            wordsToReviewArray = wordsToReview.toArray(new String[wordsToReview.size()]);
+            categoriesOfWordsToReviewArray = categoriesOfWordsToReview.toArray(new String[categoriesOfWordsToReview.size()]);
+            wordsToReviewCursor = WordListContract.getAllWordsByArray(wordsToReviewArray, categoriesOfWordsToReviewArray);
             categoriesOfWords = new ArrayList<>();
+
             if(wordsToReviewCursor!=null) {
+                startReviewBTN.setVisibility(View.VISIBLE);
                 if (wordsToReviewCursor.getCount() > 0) {
+                    if(wordsToReviewCursor.getCount() < 6){
+                        pickNumberET2.setVisibility(View.VISIBLE);
+                        numberPicker.setVisibility(View.INVISIBLE);
+                        Toast.makeText(this,"Wprowadź cyfre z zakresu 1 do " + wordsToReviewCursor.getCount(),Toast.LENGTH_SHORT).show();
+                    }else{
+                        pickNumberET2.setVisibility(View.INVISIBLE);
+                        numberPicker.setVisibility(View.VISIBLE);
+                        numberPicker.setMinValue(1);
+                        numberPicker.setMaxValue(wordsToReviewCursor.getCount());
+                    }
                     while (wordsToReviewCursor.moveToNext()) {
                         germanWordsByAccount.add(wordsToReviewCursor.getString(1));
                         polishWordsByAccount.add(wordsToReviewCursor.getString(2));
@@ -123,10 +133,9 @@ public class ReviewActivity extends AppCompatActivity {
                 Log.v("TAG", "Nie ma słów do powtórki!");
                 numberPicker.setVisibility(View.INVISIBLE);
                 startReviewBTN.setVisibility(View.INVISIBLE);
+                startReviewBTN.setVisibility(View.INVISIBLE);
                 Toast.makeText(this,"Niewystarczająca ilość słów do powtórki!",Toast.LENGTH_SHORT).show();
             }
-            numberPicker.setMinValue(1);
-            numberPicker.setMaxValue(wordsToReview.size());
         }else{
             numberPicker.setVisibility(View.INVISIBLE);
             startReviewBTN.setVisibility(View.INVISIBLE);
@@ -152,31 +161,26 @@ public class ReviewActivity extends AppCompatActivity {
     }
 
     public void onStartReview(View view) {
-        if(reviewCursor.getCount() > 5){
-            wordsToReviewCount = numberPicker.getValue();
-        }else{
+        if(wordsToReviewCursor.getCount() < 6){
             if(!pickNumberET2.getText().toString().equals("")) {
                 wordsToReviewCount = Integer.parseInt(pickNumberET2.getText().toString());
             }else{
                 Toast.makeText(this,"Wprowadź cyfre z zakresu 1 do " + reviewCursor.getCount(),Toast.LENGTH_SHORT).show();
             }
+        }else{
+            wordsToReviewCount = numberPicker.getValue();
         }
-        if((wordsToReviewCount <= reviewCursor.getCount()) && wordsToReviewCount!=0) {
+
+        if((wordsToReviewCount <= wordsToReviewCursor.getCount()) && wordsToReviewCount!=0) {
             Intent myIntent = new Intent(getApplicationContext(), LearningToPolishActivity.class);
-            if (reviewCursor.getCount() > 0) {
                 myIntent.putStringArrayListExtra("german_words", germanWordsByAccount);
                 myIntent.putStringArrayListExtra("polish_words", polishWordsByAccount);
                 myIntent.putStringArrayListExtra("word_category", categoriesOfWords);
                 myIntent.putExtra("words_to_review_count", wordsToReviewCount);
                 startActivityForResult(myIntent, 1);
-            } else {
-                Toast.makeText(this, "Niewystarczająca ilość słów do powtórki!", Toast.LENGTH_SHORT).show();
-            }
         }else{
             Toast.makeText(this,"Wprowadź cyfre z zakresu 1 do " + reviewCursor.getCount(),Toast.LENGTH_SHORT).show();
             pickNumberET2.setText("");
         }
     }
-
-
 }

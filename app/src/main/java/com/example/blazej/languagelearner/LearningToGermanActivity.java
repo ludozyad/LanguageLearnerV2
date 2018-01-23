@@ -95,7 +95,6 @@ public class LearningToGermanActivity extends AppCompatActivity {
             polishWord = polishWordsInCategory.get(index);
             toLearnWordTV.setText(polishWord);
         }else{
-            Toast.makeText(this, R.string.end_of_questions, Toast.LENGTH_SHORT).show();
             showResult();
         }
     }

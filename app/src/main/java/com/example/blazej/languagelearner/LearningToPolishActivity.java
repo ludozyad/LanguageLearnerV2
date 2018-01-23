@@ -175,7 +175,6 @@ public class LearningToPolishActivity extends AppCompatActivity {
         }
     }
 
-
     private void showResult() {
         Intent myIntent = new Intent(this,LearningSummaryActivity.class);
         myIntent.putStringArrayListExtra("german_words",germanWordsInCategory);
